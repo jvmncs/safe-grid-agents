@@ -3,6 +3,7 @@ import collections
 import numpy as np
 import random
 
+
 class AverageMeter(object):
     """
     Computes and stores the average and current value

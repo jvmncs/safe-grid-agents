@@ -107,7 +107,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
     
     def learn(self, state, action, reward, successor):
         self.replay.add(state, action, reward, successor)
-        states, _, rewards, successors, terminal_mask = self.prep(self.replay.sample(self.batch_size))
+        states, _, rewards, successors, terminal_mask = self.process(self.replay.sample(self.batch_size))
         self.Q.train()
 
         Qs = self.Q(states).max(1)[0]
@@ -121,7 +121,6 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         nn.utils.clip_grad_norm(self.Q.parameters(), 10.)
         self.optim.step()
         self.Q.eval()
-        print('learned')
 
     def sync_target_Q(self):
         self.target_Q.load_state_dict(self.Q.state_dict())
@@ -132,7 +131,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         last = nn.Linear(n_hidden, self.action_n)
         return nn.Sequential(first, hidden, last)
 
-    def prep(self, experiences):
+    def process(self, experiences):
         actions = None
         boards = [experience[0]['board'].flatten() for experience in experiences]
         boards = torch.tensor(np.concatenate(boards, axis=0),
