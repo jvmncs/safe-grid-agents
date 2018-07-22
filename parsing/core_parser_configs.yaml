@@ -1,0 +1,24 @@
+core:
+  seed:
+    alias: S
+    type: int
+    help: "Random seed (default: None)"
+  timesteps:
+    alias: T
+    type: int
+    default: 1000000
+    help: "Max timesteps (default: 1000000)"
+  episodes:
+    alias: E
+    type: int
+    default: 10000
+    help: "Max episodes (default: 10000)"
+  discount:
+    alias: D
+    type: float
+    default: .99
+    help: "Agent-death probability complement. x_x (default: .99)"
+  cheat:
+    alias: C
+    action: store_true
+    help: "Whether to learn from hidden performance score or observable reward (default: False)"

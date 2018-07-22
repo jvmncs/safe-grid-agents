@@ -1,0 +1,77 @@
+# dummy testing agents
+random: 
+single: 
+  action: 
+    alias: a
+    type: int
+    default: 0
+    help: "Which action the agent will choose (default: 0)"
+# standard RL agents
+tabular-q: 
+  epsilon: &epsilon
+    alias: e
+    type: float
+    default: .1
+    help: "Exploration constant for epsilon greedy policy (default: .1)"
+  decay-rate: &epsilon-decay
+    alias: dr
+    type: float
+    default: .99
+    help: "Rate at which to decay exploration epsilon (default: .99)"
+deep-q: 
+  epsilon: *epsilon
+  decay-rate: *epsilon-decay
+  replay-capacity:
+    alias: r
+    type: int
+    default: 5000
+    help: "Capacity of replay buffer (default: 5000)"
+  n-layers: 
+    alias: l
+    type: int
+    default: 3
+    help: "Number (non-input) layers for Q network (default: 3)"
+  n-hidden:
+    alias: hd
+    type: int
+    default: 128
+    help: "Number of neurons per hidden layer (default: 128)"
+  batch-size:
+    alias: b
+    type: int
+    default: 64
+    help: "Batch size for Q network updates (default: 64)"
+  device: 
+    alias: d
+    type: int
+    default: 0
+    help: "If using CUDA, which device to use for DQN in PyTorch (default: 0)"
+# (purportedly) safe RL agents
+tabular-ssq: 
+  epsilon: *epsilon
+  decay-rate: *epsilon-decay
+  budget: 
+    alias: b
+    type: int
+    required: y
+    help: "Max number of queries of H for supervision in SSRL (required)"
+  warmup:
+    alias: w
+    type: float
+    default: .5
+    help: "Proportion of budget to spend during warmup phase (default: .5)"
+  fuzzy-query:
+    alias: f
+    type: float
+    default: 1.
+    help: "Probability of querying H while online if budget and delta conditions are met (default: 1.)"
+  delta:
+    alias: d
+    type: float
+    default: .9
+    help: "Minimum quantile of episode returns for allowing to query H (default: .9)"
+  C-prior:
+    alias: p
+    type: float
+    default: .01
+    help: "Prior for state corruption (default: .01)"
