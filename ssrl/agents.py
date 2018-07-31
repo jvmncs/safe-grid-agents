@@ -62,11 +62,11 @@ class TabularSSQAgent(agents.TabularQAgent):
                 # corrupt episode under the current policy, which should learn to avoid corruption
                 # fairly quickly
                 # self.C[state] := P(C | E), probability that state is corrupt given the episode is
-                #   := P(E | C) * P(C) / P(E)
-                #   := 1 * P(C) / P(E), P(E | C) = 1 since episode is corrupt if any state is
-                #   := self.C[state] / P(E)
-                #   :~ self.C[state] / (N(corrupt_episodes)/N(episodes)) 
-                #   *= N(episodes) / N(corrupt_episodes)
+                #   == P(E | C) * P(C) / P(E)
+                #   == 1 * P(C) / P(E), P(E | C) = 1 since episode is corrupt if any state is
+                #   == self.C[state] / P(E)
+                #   =~ self.C[state] / (N(corrupt_episodes)/N(episodes)) 
+                #   == self.C[state] * N(episodes) / N(corrupt_episodes)
 
                 self.C[state_board]  *= self.episodes / (self.corrupt_episodes + 1)
         self.reset_history(corrupt_episode)

@@ -66,7 +66,7 @@ def prepare_parser():
     handle_parser_args({"core": parser}, "core", core_parser_configs)
 
     # Handle environment subparser args
-    env_subparsers = parser.add_subparsers(help='Types of gridworld environments')
+    env_subparsers = parser.add_subparsers(help='Types of gridworld environments', dest='env_alias')
     env_parsers = {}
     for env_name in env_map.keys():
         env_parsers[env_name] = env_subparsers.add_parser(env_name)
@@ -76,7 +76,7 @@ def prepare_parser():
     agent_subparsers = {}
     for env_name, env_parser in env_subparsers.choices.items():
         agent_parser_configs = copy.deepcopy(stashed_apcs)
-        agent_subparsers[env_name] = env_parser.add_subparsers(help='Types of agents')
+        agent_subparsers[env_name] = env_parser.add_subparsers(help='Types of agents', dest='agent_alias')
         agent_parsers = {}
         for agent_name in agent_map.keys():
             agent_parsers[agent_name] = agent_subparsers[env_name].add_parser(agent_name)

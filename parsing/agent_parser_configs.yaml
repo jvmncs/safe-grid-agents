@@ -8,6 +8,11 @@ single:
     help: "Which action the agent will choose (default: 0)"
 # standard RL agents
 tabular-q: 
+  lr: &learnrate
+    alias: l
+    type: float
+    required: true
+    help: "Learning rate (required)"
   epsilon: &epsilon
     alias: e
     type: float
@@ -19,6 +24,7 @@ tabular-q:
     default: .99
     help: "Rate at which to decay exploration epsilon (default: .99)"
 deep-q: 
+  lr: *learnrate
   epsilon: *epsilon
   decay-rate: *epsilon-decay
   replay-capacity:
@@ -27,7 +33,7 @@ deep-q:
     default: 5000
     help: "Capacity of replay buffer (default: 5000)"
   n-layers: 
-    alias: l
+    alias: ls
     type: int
     default: 3
     help: "Number (non-input) layers for Q network (default: 3)"
@@ -48,6 +54,7 @@ deep-q:
     help: "If using CUDA, which device to use for DQN in PyTorch (default: 0)"
 # (purportedly) safe RL agents
 tabular-ssq: 
+  lr: *learnrate
   epsilon: *epsilon
   decay-rate: *epsilon-decay
   budget: 

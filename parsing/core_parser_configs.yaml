@@ -21,4 +21,4 @@ core:
   cheat:
     alias: C
     action: store_true
-    help: "Whether to learn from hidden performance score or observable reward (default: False)"
+    help: "Whether to learn directly from hidden performance score (default: False)"
