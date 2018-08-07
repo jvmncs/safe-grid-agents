@@ -19,5 +19,5 @@ Steps to take when adding a new agent.
     - Additionally, following [Everitt et al.](https://arxiv.org/abs/1705.08417), we require a `learn_C` method to learn the probability of the state being corrupt.
 3. Implement a warmup function in `<top>/warmup.py`, and make sure it's importable from `common/warmup.py`.
 4. Add a new entry for the agent's CLI arguments in `parsing/agent_parser_configs.yaml`.  Follow the existing pattern and check for previously implemented anchors that cover the arguments you need (e.g. `epsilon-decay`).  These configs should be organized by where they appear in the folder structure of the repository.
-5. TODO Add a function describing the agent-environment interaction.
-6. TODO Add a function describing agent evaluation in the environment.
+5. TODO Add a function defining the agent-environment interaction.
+6. TODO Add a function defining agent evaluation in the environment.

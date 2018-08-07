@@ -31,6 +31,7 @@ agent_map = {
 type_map = {
     "float": float,
     "int": int,
+    "str": str,
 }
 def map_type(x):
     try:

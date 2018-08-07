@@ -6,13 +6,18 @@ core:
   timesteps:
     alias: T
     type: int
-    default: 1000000
-    help: "Max timesteps (default: 1000000)"
-  episodes:
+    default: 5000000
+    help: "Max timesteps (default: 5000000)"
+  eval-timesteps:
+    alias: V
+    type: int
+    default: 25000
+    help: "Number of timesteps during eval period (default: 25000)"
+  eval-every:
     alias: E
     type: int
-    default: 10000
-    help: "Max episodes (default: 10000)"
+    default: 250000
+    help: "Number of timesteps between eval periods (default: 250000)"
   discount:
     alias: D
     type: float
@@ -22,3 +27,7 @@ core:
     alias: C
     action: store_true
     help: "Whether to learn directly from hidden performance score (default: False)"
+  log-dir:
+    alias: L
+    type: str
+    help: "Subdirectory to write logs to for this run (uses tensorboardX's default)"

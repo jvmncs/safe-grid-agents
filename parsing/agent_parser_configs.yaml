@@ -18,20 +18,25 @@ tabular-q:
     type: float
     default: .1
     help: "Exploration constant for epsilon greedy policy (default: .1)"
-  decay-rate: &epsilon-decay
-    alias: dr
-    type: float
-    default: .99
-    help: "Rate at which to decay exploration epsilon (default: .99)"
+  epsilon-anneal: &epsilon-anneal
+    alias: dl
+    type: int
+    default: 100000
+    help: "Number of timesteps to linearly anneal epsilon exploration (default: 100000)"
 deep-q: 
   lr: *learnrate
   epsilon: *epsilon
-  decay-rate: *epsilon-decay
+  epsilon-anneal: *epsilon-anneal
   replay-capacity:
     alias: r
     type: int
-    default: 5000
-    help: "Capacity of replay buffer (default: 5000)"
+    default: 20000
+    help: "Capacity of replay buffer (default: 20000)"
+  sync-every:
+    alias: s
+    type: int
+    default: 10000
+    help: "Number of timesteps to wait before syncing target network (default: 10000)"
   n-layers: 
     alias: ls
     type: int
@@ -48,7 +53,7 @@ deep-q:
     default: 64
     help: "Batch size for Q network updates (default: 64)"
   device: 
-    alias: d
+    alias: dv
     type: int
     default: 0
     help: "If using CUDA, which device to use for DQN in PyTorch (default: 0)"
@@ -56,7 +61,7 @@ deep-q:
 tabular-ssq: 
   lr: *learnrate
   epsilon: *epsilon
-  decay-rate: *epsilon-decay
+  epsilon-anneal: *epsilon-anneal
   budget: 
     alias: b
     type: int
@@ -73,7 +78,7 @@ tabular-ssq:
     default: 1.
     help: "Probability of querying H while online if budget and delta conditions are met (default: 1.)"
   delta:
-    alias: d
+    alias: dt
     type: float
     default: .9
     help: "Minimum quantile of episode returns for allowing to query H (default: .9)"
