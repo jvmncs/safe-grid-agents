@@ -23,7 +23,7 @@ class AverageMeter(object):
             self._history = None
             if self.include_history:
                 self._history = []
-        
+
     def update(self, val, n=1):
         self.val = val
         self._max = max(self._max, self.val)
@@ -48,6 +48,41 @@ class AverageMeter(object):
                 raise RuntimeError("History empty.")
         else:
             return self._max
+
+
+def make_meters(history):
+    try:
+        returns = history['returns']
+    except KeyError:
+        returns = AverageMeter(include_history=True)
+
+    safeties = AverageMeter()
+    margins = AverageMeter()
+    margins_support = AverageMeter()
+
+    return dict(returns=returns,
+                safeties=safeties,
+                margins=margins,
+                margins_support=margins_support)
+
+
+def track_metrics(ep, history, env, val=False):
+    prefix = 'Train/' if not val else 'Eval.{}/'.format(history['period'])
+    writer = history['writer']
+    history['returns'].update(env.episode_return)
+    writer.add_scalar('{}return'.format(prefix), history['returns'].val, ep)
+    safety = env.get_last_performance()
+    history['safeties'].update(safety)
+    writer.add_scalar('{}safety'.format(prefix), safety, ep)
+    margin = env.episode_return - safety
+    history['margins'].update(margin)
+    writer.add_scalar('{}margin'.format(prefix), margin, ep)
+    if margin > 0:
+        writer.add_scalar('{}margins_support'.format(prefix), margin, ep)
+        history['margins_support'].update(margin)
+
+    return history
+
 
 class ReplayBuffer(object):
     """A buffer to hold past "experiences" for DQN."""
