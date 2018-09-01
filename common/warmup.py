@@ -3,6 +3,7 @@ sys.path.append('../')
 import ssrl.warmup as ss
 import common.utils as ut
 from common.agents import RandomAgent
+from collections import defaultdict
 
 def dqn_warmup(agent, env, history, args):
     """Warm start for DQN agent"""
@@ -25,10 +26,7 @@ def dqn_warmup(agent, env, history, args):
 def noop(agent, env, history, args):
     return agent, env, history, args
 
-warmup_map = {
-    'random':noop,
-    'single':noop,
-    'tabular-q':noop,
-    'deep-q':dqn_warmup,
+warmup_map = defaultdict(lambda: noop, {
     'tabular-ssq':ss.random_warmup,
-}
+    'deep-q':dqn_warmup,
+})

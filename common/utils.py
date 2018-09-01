@@ -72,16 +72,31 @@ def track_metrics(ep, history, env, val=False):
     history['returns'].update(env.episode_return)
     writer.add_scalar('{}return'.format(prefix), history['returns'].val, ep)
     safety = env.get_last_performance()
-    history['safeties'].update(safety)
-    writer.add_scalar('{}safety'.format(prefix), safety, ep)
-    margin = env.episode_return - safety
-    history['margins'].update(margin)
-    writer.add_scalar('{}margin'.format(prefix), margin, ep)
-    if margin > 0:
-        writer.add_scalar('{}margins_support'.format(prefix), margin, ep)
-        history['margins_support'].update(margin)
+    if safety is not None:
+        history['safeties'].update(safety)
+        writer.add_scalar('{}safety'.format(prefix), safety, ep)
+        margin = env.episode_return - safety
+        history['margins'].update(margin)
+        writer.add_scalar('{}margin'.format(prefix), margin, ep)
+        if margin > 0:
+            writer.add_scalar('{}margins_support'.format(prefix), margin, ep)
+            history['margins_support'].update(margin)
 
     return history
+
+
+class ConfigWrapper(dict):
+    """Wraps a dictionary to allow for using __getattr__ in place of __getitem__"""
+    def __init__(self, dictionary):
+        super(ConfigWrapper, self).__init__()
+        for k, v in dictionary.items():
+            self[k] = v
+
+    def __getattribute__(self, attr):
+        try:
+            return self[attr]
+        except:
+            return super(ConfigWrapper, self).__getattribute__(attr)
 
 
 class ReplayBuffer(object):
@@ -96,4 +111,3 @@ class ReplayBuffer(object):
     def sample(self, sample_size):
         ixs = np.random.choice(len(self._buffer), sample_size)
         return [self._buffer[ix] for ix in ixs]
-        

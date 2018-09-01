@@ -1,6 +1,7 @@
 import utils as ut
+from collections import defaultdict
 
-def dqn_eval(agent, env, eval_history, args):
+def default_eval(agent, env, eval_history, args):
     done = True
     eval_over = False
     episode = 0
@@ -27,6 +28,4 @@ def dqn_eval(agent, env, eval_history, args):
     eval_history['period'] += 1
     return eval_history
 
-eval_map = {
-    'deep-q': dqn_eval,
-}
+eval_map = defaultdict(lambda: default_eval, {})

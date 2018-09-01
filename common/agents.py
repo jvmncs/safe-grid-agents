@@ -10,7 +10,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-
 # Baseline agents
 class RandomAgent(base.BaseActor):
     """Random walk"""
@@ -39,7 +38,8 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.action_n = env.action_spec().maximum + 1
 
         # Agent definition
-        self.epsilon = args.epsilon
+        self.future_eps = [1. - args.epsilon * t / args.epsilon_anneal for t in range(args.epsilon_anneal)]
+        self.update_epsilon()
         self.discount = args.discount
         self.lr = args.lr
         self.Q = defaultdict(lambda: np.zeros(self.action_n))
@@ -64,6 +64,11 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         target = reward + self.discount * value_estimate_next
         differential = target - self.Q[state_board][action]
         self.Q[state_board][action] += self.lr * differential
+
+    def update_epsilon(self):
+        if len(self.future_eps) > 0:
+            self.epsilon = self.future_eps.pop(0)
+        return self.epsilon
 
 class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
     """Q-learner with deep function approximation."""
@@ -103,8 +108,17 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         else:
             action = self.act(state)
         return action.item()
-    
-    def learn(self, state, action, reward, successor):
+
+    def policy(self, state):
+        argmax = self.act(state)
+        probs = torch.zeros(self.action_n,
+                            requires_grad=False,
+                            dtype=torch.float32,
+                            device=self.device) + self.epsilon / self.action_n
+        probs[argmax] += 1 - self.epsilon
+        return probs
+
+    def learn(self, state, action, reward, successor, writer=None, ep=None):
         self.replay.add(state, action, reward, successor)
         states, _, rewards, successors, terminal_mask = self.process(self.replay.sample(self.batch_size))
         self.Q.train()
@@ -130,8 +144,8 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
             self.epsilon = self.future_eps.pop(0)
 
     def build_Q(self, n_input, n_layers, n_hidden):
-        first = nn.Linear(n_input, n_hidden)
-        hidden = nn.Sequential(*tuple(nn.Linear(n_hidden, n_hidden) for _ in range(n_layers - 1)))
+        first = nn.Sequential(nn.Linear(n_input, n_hidden), nn.ReLU())
+        hidden = nn.Sequential(*tuple(nn.Sequential(nn.Linear(n_hidden, n_hidden), nn.ReLU()) for _ in range(n_layers - 1)))
         last = nn.Linear(n_hidden, self.action_n)
         return nn.Sequential(first, hidden, last)
 

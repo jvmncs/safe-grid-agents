@@ -6,18 +6,18 @@ core:
   timesteps:
     alias: T
     type: int
-    default: 5000000
-    help: "Max timesteps (default: 5000000)"
+    default: 1000000
+    help: "Max timesteps (default: 1000000)"
   eval-timesteps:
     alias: V
     type: int
-    default: 25000
-    help: "Number of timesteps during eval period (default: 25000)"
+    default: 10000
+    help: "Number of timesteps during eval period (default: 10000)"
   eval-every:
     alias: E
     type: int
-    default: 250000
-    help: "Number of timesteps between eval periods (default: 250000)"
+    default: 50000
+    help: "Number of timesteps between eval periods (default: 50000)"
   discount:
     alias: D
     type: float
