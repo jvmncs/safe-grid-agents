@@ -1,10 +1,14 @@
 import yaml
 import argparse
 import copy
+import sys
+sys.path.append('ai-safety-gridworlds/')
 from ai_safety_gridworlds.environments.boat_race import BoatRaceEnvironment
 from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvironment
-from common.agents import *
-from ssrl import TabularSSQAgent
+from ai_safety_gridworlds.environments.side_effects_sokoban import SideEffectsSokobanEnvironment
+from safe_grid_agents.common.agents import *
+from safe_grid_agents.ssrl import TabularSSQAgent
+from . import core_config, env_config, agent_config
 
 # Mapping of envs/agents to Python classes
 env_map = {
@@ -15,7 +19,7 @@ env_map = {
     # 'bandit':FriendFoeEnvironment,
     # 'island':IslandNavigationEnvironment,
     # 'interrupt':SafeInterruptibilityEnvironment,
-    # 'sokoban':SideEffectsSokobanEnvironment,
+    'sokoban':SideEffectsSokobanEnvironment,
     'tomato':TomatoWateringEnvironment,
     # 'whisky':WhiskyOrGoldEnvironment,
 }
@@ -44,19 +48,19 @@ def handle_parser_args(parsers, name, configs):
     p = parsers[name]
     config = configs[name]
     try:
-        for key in config.keys():
-            argattrs = {k:map_type(v) for k, v in config.pop(key).iteritems()}
+        for key in list(config.keys()):
+            argattrs = {k:map_type(v) for k, v in config.pop(key).items()}
             alias = argattrs.pop("alias")
             p.add_argument('-{}'.format(alias), '--{}'.format(key), **argattrs)
     except AttributeError as e:
         return
 
 # Import yaml configs
-with open('parsing/core_parser_configs.yaml') as core_yaml:
+with open(core_config) as core_yaml:
     core_parser_configs = yaml.load(core_yaml)
-with open('parsing/env_parser_configs.yaml', 'r') as env_yaml:
+with open(env_config, 'r') as env_yaml:
     env_parser_configs = yaml.load(env_yaml)
-with open('parsing/agent_parser_configs.yaml', 'r') as agent_yaml:
+with open(agent_config, 'r') as agent_yaml:
     agent_parser_configs = yaml.load(agent_yaml)
 stashed_apcs = copy.deepcopy(agent_parser_configs)
 
@@ -68,6 +72,7 @@ def prepare_parser():
 
     # Handle environment subparser args
     env_subparsers = parser.add_subparsers(help='Types of gridworld environments', dest='env_alias')
+    env_subparsers.required=True
     env_parsers = {}
     for env_name in env_map.keys():
         env_parsers[env_name] = env_subparsers.add_parser(env_name)
@@ -78,6 +83,7 @@ def prepare_parser():
     for env_name, env_parser in env_subparsers.choices.items():
         agent_parser_configs = copy.deepcopy(stashed_apcs)
         agent_subparsers[env_name] = env_parser.add_subparsers(help='Types of agents', dest='agent_alias')
+        agent_subparsers[env_name].required=True
         agent_parsers = {}
         for agent_name in agent_map.keys():
             agent_parsers[agent_name] = agent_subparsers[env_name].add_parser(agent_name)

@@ -1,8 +1,8 @@
-from parsing import prepare_parser, env_map, agent_map
-from common.warmup import warmup_map
-from common.learn import learn_map
-from common.eval import eval_map
-import common.utils as ut
+from safe_grid_agents.parsing import prepare_parser, env_map, agent_map
+from safe_grid_agents.common.warmup import warmup_map
+from safe_grid_agents.common.learn import learn_map
+from safe_grid_agents.common.eval import eval_map
+from safe_grid_agents.common import utils as ut
 
 import os
 import errno
@@ -14,16 +14,16 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     # Create logging directory
-    if args.log_dir != "None":
+    try:
         if not os.path.exists(args.log_dir):
             try:
                 os.makedirs(args.log_dir)
             except OSError as exc: # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
-    else:
+    except TypeError:
         args.log_dir = None
-    
+
     # Get relevant env, agent, warmup function
     env_class = env_map[args.env_alias]
     agent_class = agent_map[args.agent_alias]

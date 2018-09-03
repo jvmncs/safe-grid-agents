@@ -1,8 +1,6 @@
-import sys
-sys.path.append('../')
-import ssrl.warmup as ss
-import common.utils as ut
-from common.agents import RandomAgent
+import safe_grid_agents.ssrl.warmup as ss
+import safe_grid_agents.common.utils as ut
+from safe_grid_agents.common.agents import RandomAgent
 from collections import defaultdict
 
 def dqn_warmup(agent, env, history, args):

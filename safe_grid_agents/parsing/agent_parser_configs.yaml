@@ -21,8 +21,8 @@ tabular-q:
   epsilon-anneal: &epsilon-anneal
     alias: dl
     type: int
-    default: 100000
-    help: "Number of timesteps to linearly anneal epsilon exploration (default: 100000)"
+    default: 900000
+    help: "Number of timesteps to linearly anneal epsilon exploration (default: 900000)"
 deep-q:
   lr: *learnrate
   epsilon: *epsilon

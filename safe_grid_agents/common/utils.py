@@ -11,7 +11,6 @@ class AverageMeter(object):
     def __init__(self, include_history=False):
         self.include_history = include_history
         self.reset(reset_history=True)
-        self._max = None
 
     def reset(self, reset_history=False):
         self.val = 0

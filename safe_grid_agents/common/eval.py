@@ -1,4 +1,4 @@
-import utils as ut
+from . import utils as ut
 from collections import defaultdict
 
 def default_eval(agent, env, eval_history, args):

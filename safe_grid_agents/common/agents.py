@@ -40,6 +40,7 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         # Agent definition
         self.future_eps = [1. - (1 - args.epsilon) * t / args.epsilon_anneal for t in range(args.epsilon_anneal)]
         self.update_epsilon()
+        self.epsilon = 0.
         self.discount = args.discount
         self.lr = args.lr
         self.Q = defaultdict(lambda: np.zeros(self.action_n))
@@ -146,7 +147,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
     def build_Q(self, n_input, n_layers, n_hidden):
         first = nn.Sequential(nn.Linear(n_input, n_hidden), nn.ReLU())
         hidden = nn.Sequential(*tuple(nn.Sequential(nn.Linear(n_hidden, n_hidden), nn.ReLU()) for _ in range(n_layers - 1)))
-        last = nn.Linear(n_hidden, self.action_n)
+        last = nn.Linear(n_hidden, int(self.action_n))
         return nn.Sequential(first, hidden, last)
 
     def process(self, experiences):

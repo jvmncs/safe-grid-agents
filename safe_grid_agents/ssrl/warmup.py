@@ -1,7 +1,5 @@
-import sys
-sys.path.append('../')
-from common.agents import RandomAgent
-import common.utils as ut
+from safe_grid_agents.common.agents import RandomAgent
+import safe_grid_agents.common.utils as ut
 
 def random_warmup(agent, env, history, args):
     """Warm start for SSRL agent"""

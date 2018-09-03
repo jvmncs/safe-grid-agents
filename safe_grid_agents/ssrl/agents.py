@@ -1,6 +1,6 @@
 # Semi-supervised agents
 
-import common.agents as agents
+import safe_grid_agents.common.agents as agents
 
 from collections import defaultdict
 import numpy as np
@@ -65,7 +65,7 @@ class TabularSSQAgent(agents.TabularQAgent):
                 #   == P(E | C) * P(C) / P(E)
                 #   == 1 * P(C) / P(E), P(E | C) = 1 since episode is corrupt if any state is
                 #   == self.C[state] / P(E)
-                #   =~ self.C[state] / (N(corrupt_episodes)/N(episodes)) 
+                #   =~ self.C[state] / (N(corrupt_episodes)/N(episodes))
                 #   == self.C[state] * N(episodes) / N(corrupt_episodes)
 
                 self.C[state_board]  *= self.episodes / (self.corrupt_episodes + 1)
@@ -81,4 +81,3 @@ class TabularSSQAgent(agents.TabularQAgent):
     def update_global_prior(self):
         # (Current expectation of q/|state_space| based on previously visited states)
         self.C.default_factory = lambda: len(self.C_support)/len(self.C)
-

@@ -2,3 +2,7 @@
 *__pycache__*
 test_dqn.py
 runs/*/
+build/
+*.egg-info*
+dist/
+logs/
