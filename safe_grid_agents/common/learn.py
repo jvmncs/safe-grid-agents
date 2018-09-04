@@ -17,7 +17,7 @@ def dqn_learn(t, agent, env, env_state, history, args):
 
     # Modify exploration
     agent.update_epsilon()
-    history['writer'].add_scalar('Train/epsilon', eps, t)
+    history['writer'].add_scalar('Train/epsilon', agent.epsilon, t)
 
     # Sync target and policy networks
     if t % args.sync_every == args.sync_every - 1:

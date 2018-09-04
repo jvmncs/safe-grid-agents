@@ -44,6 +44,7 @@ if __name__=='__main__':
     agent, env, history, args = warmup_fn(agent, env, history, args)
 
     # Learn and occasionally eval
+    print("#### LEARNING ####\n")
     eval_next = False
     done = True
     episode = 0
