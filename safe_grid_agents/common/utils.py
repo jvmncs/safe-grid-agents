@@ -16,7 +16,7 @@ class AverageMeter(object):
         self.val = 0
         self.avg = 0
         self.sum = 0
-        self._max = -float('inf')
+        self._max = -float("inf")
         self.count = 0
         if reset_history:
             self._history = None
@@ -42,11 +42,8 @@ class AverageMeter(object):
 
     @property
     def max(self):
-        if (self._history is None or len(self._history) == 0):
-            if self._max == -float("inf"):
-                raise RuntimeError("History empty.")
-        else:
-            return self._max
+        return self._max
+
 
 
 def make_meters(history):
@@ -65,21 +62,34 @@ def make_meters(history):
                 margins_support=margins_support)
 
 
-def track_metrics(ep, history, env, val=False):
-    prefix = 'Train/' if not val else 'Eval.{}/'.format(history['period'])
-    writer = history['writer']
+def track_metrics(ep, history, env, val=False, write=True):
+    # Update meters
     history['returns'].update(env.episode_return)
-    writer.add_scalar('{}return'.format(prefix), history['returns'].val, ep)
     safety = env.get_last_performance()
     if safety is not None:
         history['safeties'].update(safety)
-        writer.add_scalar('{}safety'.format(prefix), safety, ep)
         margin = env.episode_return - safety
         history['margins'].update(margin)
-        writer.add_scalar('{}margin'.format(prefix), margin, ep)
         if margin > 0:
-            writer.add_scalar('{}margins_support'.format(prefix), margin, ep)
             history['margins_support'].update(margin)
+
+    # Write to Tensorboard
+    prefix = 'Train/' if not val else 'Evaluation/'
+    writer = history['writer']
+    if not val and write:
+        writer.add_scalar('{}returns'.format(prefix), history['returns'].val, ep)
+        if safety is not None:
+            writer.add_scalar('{}safeties'.format(prefix), safety, ep)
+            writer.add_scalar('{}margins'.format(prefix), margin, ep)
+            if margin > 0:
+                writer.add_scalar('{}margins_support'.format(prefix), margin, ep)
+    elif val and write:
+        # ep should be eval_period here (number of evals so far), not episode number
+        for kw in ['returns', 'safeties', 'margins', 'margins_support']:
+            if safety is None and kw != 'returns':
+                continue
+            else:
+                writer.add_scalars('{}{}'.format(prefix, kw), {'avg':history[kw].avg, 'max':history[kw].max}, ep)
 
     return history
 

@@ -9,7 +9,6 @@ def default_eval(agent, env, eval_history, args):
     print("#### EVAL ####")
     while True:
         if done:
-            eval_history = ut.track_metrics(episode, eval_history, env, val=True)
             (step_type, reward, discount, state), done = env.reset(), False
             episode += 1
             if eval_over:
@@ -21,6 +20,7 @@ def default_eval(agent, env, eval_history, args):
         t += 1
         eval_over = t >= args.eval_timesteps
 
+    eval_history = ut.track_metrics(eval_history['period'], eval_history, env, val=True)
     eval_history['returns'].reset()
     eval_history['safeties'].reset()
     eval_history['margins'].reset()
