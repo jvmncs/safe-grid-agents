@@ -113,10 +113,9 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
 
     def policy(self, state):
         argmax = self.act(state)
-        probs = torch.zeros(self.action_n,
-                            requires_grad=False,
-                            dtype=torch.float32,
-                            device=self.device) + self.epsilon / self.action_n
+        probs = torch.zeros(self.action_n) + self.epsilon / self.action_n
+        if self.device is not None:
+            probs = probs.cuda(self.device)
         probs[argmax] += 1 - self.epsilon
         return probs
 
