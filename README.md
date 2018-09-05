@@ -16,9 +16,9 @@ You can use a CLI to modularly drop agents into arbitrary safety gridworlds.  Fo
 will train a TabularQAgent on the BoatRaceEnvironment with a learning rate of 0.5.
 
 There are a number of customizable parameters to modify training runs.  These parameters are split into three groups:
-- Core arguments: args that are shared across all agents/environments. Found in [`parsing/core_parser_configs.yaml`](https://github.com/jvmancuso/safe-grid-agents/blob/master/safe_grid_agents/parsing/core_parser_configs.yaml).
-- Environment arguments: args specific to environments but shared across agents.  Currently empty, but could be useful for specific environments, depending on the agent.  Found in [`parsing/env_parser_configs.yaml`](https://github.com/jvmancuso/safe-grid-agents/blob/master/safe_grid_agents/parsing/env_parser_configs.yaml).
-- Agent environments: args specific to agents.  Most hyperparameters live here.  Found in [`parsing/agent_parser_configs.yaml`](https://github.com/jvmancuso/safe-grid-agents/blob/master/safe_grid_agents/parsing/agent_parser_configs.yaml).
+- Core arguments: args that are shared across all agents/environments. Found in [`parsing/core_parser_configs.yaml`](https://github.com/jvmancuso/safe-grid-agents/blob/campx031/safe_grid_agents/parsing/core_parser_configs.yaml).
+- Environment arguments: args specific to environments but shared across agents.  Currently empty, but could be useful for specific environments, depending on the agent.  Found in [`parsing/env_parser_configs.yaml`](https://github.com/jvmancuso/safe-grid-agents/blob/campx031/safe_grid_agents/parsing/env_parser_configs.yaml).
+- Agent environments: args specific to agents.  Most hyperparameters live here.  Found in [`parsing/agent_parser_configs.yaml`](https://github.com/jvmancuso/safe-grid-agents/blob/campx031/safe_grid_agents/parsing/agent_parser_configs.yaml).
 
 The generalized form for the CLI is
 ```bash
@@ -45,6 +45,6 @@ Steps to take when adding a new agent.
     - SSRL requires a stronger agent H to learn from, so we require a `query_H` method for each agent.
     - Additionally, following [Everitt et al.](https://arxiv.org/abs/1705.08417), we require a `learn_C` method to learn the probability of the state being corrupt.
 3. (optional) Implement a warmup function in `<top>/warmup.py`, and make sure it's importable from `common/warmup.py`.  The `noop` default warmup function works for agents that don't require any special functionality.
-4. Implement a function describing the agent's learning feedback loop in `<top>/learn.py`.  See [`common/learn.py`](https://github.com/jvmancuso/safe-grid-agents/blob/master/safe_grid_agents/common/learn.py) for an example distinguishing DQN from a tabular Q-learning agent.
+4. Implement a function describing the agent's learning feedback loop in `<top>/learn.py`.  See [`common/learn.py`](https://github.com/jvmancuso/safe-grid-agents/blob/campx031/safe_grid_agents/common/learn.py) for an example distinguishing DQN from a tabular Q-learning agent.
 5. (optional) Implement a function in `<top>/eval.py` describing the evaluation feedback loop.  The `default_eval` function in `common/eval.py` should cover most cases, so you may not need to add anything for evaluation.
 6. Add a new entry for the agent's CLI arguments in `parsing/agent_parser_configs.yaml`.  Follow the existing pattern and check for previously implemented YAML anchors that cover the arguments you need (e.g. `learnrate`, `epsilon-anneal`, etc.).  These configs should be organized by where they appear in the folder structure of the repository.
