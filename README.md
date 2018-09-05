@@ -3,12 +3,11 @@ safe-grid-agents
 Training (hopefully) safe agents in gridworlds
 
 ## Layout
-- `ai-safety-gridworlds`: Fork of DeepMind's official [repo](https://github.com/deepmind/ai-safety-gridworlds). TODO convert to proper submodule
-- `common`: Core codebase. Includes abstract base classes for a variety of agents, standard RL agents, their associated warmup functions, and a utilities file.
+- `ai-safety-gridworlds`: Submodule of DeepMind's official [repo](https://github.com/deepmind/ai-safety-gridworlds).
+- `safe_grid_agents/common`: Core codebase. Includes abstract base classes for a variety of agents, standard RL agents, their associated warmup functions, and a utilities file.
 - `main.py`: Python executable for composing training jobs.
-- `parsing`: Helpers that construct a flexible CLI for `main.py`.
-- `pycolab`: Submodule of Deepmind's official [repo](https://github.com/deepmind/pycolab) TODO remove when gridworlds is a submodule
-- `ssrl`: Agents that implement semi-supervised reinforcement learning and their associated warmup functions.
+- `safe_grid_agents/parsing`: Helpers that construct a flexible CLI for `main.py`.
+- `safe_grid_agents/ssrl`: Agents that implement semi-supervised reinforcement learning and their associated warmup functions.
 
 ## Adding agents
 Steps to take when adding a new agent.
