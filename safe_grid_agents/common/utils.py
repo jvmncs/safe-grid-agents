@@ -45,7 +45,6 @@ class AverageMeter(object):
         return self._max
 
 
-
 def make_meters(history):
     try:
         returns = history['returns']
