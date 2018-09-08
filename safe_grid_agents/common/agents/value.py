@@ -1,8 +1,7 @@
-# Core agents
+# Value Agents
 from . import base
 from . import utils
 
-import random
 from collections import defaultdict
 import numpy as np
 import torch
@@ -12,27 +11,6 @@ from torch.autograd import Variable
 
 
 # Baseline agents
-class RandomAgent(base.BaseActor):
-    """Random walk"""
-    def __init__(self, env, args):
-        self.action_n = int(env.action_spec().maximum + 1)
-        if args.seed:
-            random.seed(args.seed)
-
-    def act(self, state):
-        return random.randint(0, self.action_n)
-
-
-class SingleActionAgent(base.BaseActor):
-    """Always chooses a single boring action (for testing)"""
-    def __init__(self, env, args):
-        self.action = args.action
-        assert self.action <  env.action_spec().maximum + 1, "Not a valid action."
-
-    def act(self, state):
-        return self.action
-
-
 class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
     """Tabular Q-learner."""
     def __init__(self, env, args):
@@ -102,13 +80,13 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         if self.device is not None:
             state_board = state_board.cuda(self.device)
         scores = self.Q(state_board)
-        return scores.max(1)[1]
+        return scores.max(1)[1].data[0]
 
     def act_explore(self, state):
         if (torch.rand(1) < self.epsilon).all():
-            action = torch.ones(self.action_n).multinomial(1)
+            action = torch.ones(self.action_n).multinomial(1)[0]
         else:
-            action = self.act(state).data[0]
+            action = self.act(state)
         return action
 
     def policy(self, state):
@@ -119,7 +97,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         probs[argmax] += 1 - self.epsilon
         return probs
 
-    def learn(self, state, action, reward, successor, writer=None, ep=None):
+    def learn(self, state, action, reward, successor):
         self.replay.add(state, action, reward, successor)
         states, _, rewards, successors, terminal_mask = self.process(self.replay.sample(self.batch_size))
         self.Q.train()
@@ -143,6 +121,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
     def update_epsilon(self):
         if len(self.future_eps) > 0:
             self.epsilon = self.future_eps.pop(0)
+        return self.epsilon
 
     def build_Q(self, n_input, n_layers, n_hidden):
         first = nn.Sequential(nn.Linear(n_input, n_hidden), nn.ReLU())
