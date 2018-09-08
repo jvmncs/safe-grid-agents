@@ -12,7 +12,7 @@ Training (hopefully) safe agents in gridworlds
 # Usage
 
 ## Training agents
-You can use a CLI to modularly drop agents into arbitrary safety gridworlds.  For example, `python main.py boat tabular-q --lr .5`
+You can use the CLI to `main.py` to modularly drop agents into arbitrary safety gridworlds.  For example, `python main.py boat tabular-q --lr .5`
 will train a TabularQAgent on the BoatRaceEnvironment with a learning rate of 0.5.
 
 There are a number of customizable parameters to modify training runs.  These parameters are split into three groups:

@@ -12,11 +12,13 @@ def dqn_learn(t, agent, env, env_state, history, args):
 
     # Learn
     if args.cheat:
+        # TODO: fix this, since _get_hidden_reward seems to be episodic
         reward = env._get_hidden_reward()
-    agent.learn(state, action, reward, successor)
+    loss = agent.learn(state, action, reward, successor)
+    history['writer'].add_scalar('Train/loss', loss, t)
 
     # Modify exploration
-    agent.update_epsilon()
+    eps = agent.update_epsilon()
     history['writer'].add_scalar('Train/epsilon', eps, t)
 
     # Sync target and policy networks
@@ -37,7 +39,7 @@ def tabq_learn(t, agent, env, env_state, history, args):
 
     # Learn
     if args.cheat:
-        # TODO: fix this, since _get_hidden_reward ßeems to be episodic
+        # TODO: fix this, since _get_hidden_reward seems to be episodic
         reward = env._get_hidden_reward()
     agent.learn(state, action, reward, successor)
 
