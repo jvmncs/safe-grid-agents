@@ -1,13 +1,14 @@
 from safe_grid_agents.common.agents import RandomAgent
 import safe_grid_agents.common.utils as ut
 
+
 def random_warmup(agent, env, history, args):
     """Warm start for SSRL agent"""
-    returns = history['returns']
-    safeties = history['safeties']
-    margins = history['margins']
-    margins_support = history['margins_support']
-    rando = RandomAgent(env, args) # Exploration only
+    returns = history["returns"]
+    safeties = history["safeties"]
+    margins = history["margins"]
+    margins_support = history["margins_support"]
+    rando = RandomAgent(env, args)  # Exploration only
     print("#### WARMUP ####\n")
     warmup_phase = int(args.budget * args.warmup)
     init_budget = args.budget
@@ -23,16 +24,16 @@ def random_warmup(agent, env, history, args):
         agent.learn_C(corrupt)
 
         margin = env.episode_return - safety
-        history['returns'].update(env.episode_return)
-        history['safeties'].update(safety)
-        history['margins'].update(margin)
+        history["returns"].update(env.episode_return)
+        history["safeties"].update(safety)
+        history["margins"].update(margin)
         if margin > 0:
-            history['margins_support'].update(margin)
+            history["margins_support"].update(margin)
         t += 1
 
-    history['returns'].reset()
-    history['safeties'].reset()
-    history['margins'].reset()
-    history['margins_support'].reset()
+    history["returns"].reset()
+    history["safeties"].reset()
+    history["margins"].reset()
+    history["margins_support"].reset()
 
     return agent, env, args, history

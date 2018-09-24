@@ -3,6 +3,7 @@ import abc
 
 class BaseActor(object):
     """Mixin for actors.  All agents must inherit."""
+
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
@@ -13,6 +14,7 @@ class BaseActor(object):
 
 class BaseExplorer(object):
     """Mixin for actors who can explore.  Optional."""
+
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
@@ -26,6 +28,7 @@ class BaseExplorer(object):
 
 class BaseLearner(object):
     """Mixin for learners.  Not strictly necessary, but advisable."""
+
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod

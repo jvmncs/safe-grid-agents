@@ -1,6 +1,7 @@
 from collections import defaultdict
 import copy
 
+
 def dqn_learn(t, agent, env, env_state, history, args):
     """Learning loop for DeepQAgent"""
     step_type, reward, discount, state = env_state
@@ -15,11 +16,11 @@ def dqn_learn(t, agent, env, env_state, history, args):
         # TODO: fix this, since _get_hidden_reward seems to be episodic
         reward = env._get_hidden_reward()
     loss = agent.learn(state, action, reward, successor)
-    history['writer'].add_scalar('Train/loss', loss, t)
+    history["writer"].add_scalar("Train/loss", loss, t)
 
     # Modify exploration
     eps = agent.update_epsilon()
-    history['writer'].add_scalar('Train/epsilon', eps, t)
+    history["writer"].add_scalar("Train/epsilon", eps, t)
 
     # Sync target and policy networks
     if t % args.sync_every == args.sync_every - 1:
@@ -45,12 +46,9 @@ def tabq_learn(t, agent, env, env_state, history, args):
 
     # Modify exploration
     eps = agent.update_epsilon()
-    history['writer'].add_scalar('Train/epsilon', eps, t)
+    history["writer"].add_scalar("Train/epsilon", eps, t)
 
     return (step_type, reward, discount, successor), history
 
 
-learn_map = {
-    'deep-q': dqn_learn,
-    'tabular-q': tabq_learn,
-}
+learn_map = {"deep-q": dqn_learn, "tabular-q": tabq_learn}
