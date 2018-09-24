@@ -2,17 +2,19 @@ import bisect
 import collections
 import numpy as np
 import random
+from typing import Dict, List
+from types import History, Transition
 
 
 class AverageMeter(object):
     """Computes and stores the average and current value Extended from https://
     github.com/pytorch/examples/blob/master/imagenet/main.py#L247-L262."""
 
-    def __init__(self, include_history=False):
+    def __init__(self, include_history: bool = False) -> None:
         self.include_history = include_history
         self.reset(reset_history=True)
 
-    def reset(self, reset_history=False):
+    def reset(self, reset_history=False) -> None:
         self.val = 0
         self.avg = 0
         self.sum = 0
@@ -23,7 +25,7 @@ class AverageMeter(object):
             if self.include_history:
                 self._history = []
 
-    def update(self, val, n=1):
+    def update(self, val, n: int = 1) -> None:
         self.val = val
         self._max = max(self._max, self.val)
         self.sum += val * n
@@ -33,7 +35,7 @@ class AverageMeter(object):
             for x in range(n):
                 bisect.insort(self._history, val)
 
-    def quantile(self, delta):
+    def quantile(self, delta: float) -> np.ndarray:
         if self._history is not None:
             q = (1 - delta) * 100
             return np.percentile(self._history, q=q)
@@ -41,11 +43,11 @@ class AverageMeter(object):
             raise RuntimeError("Meter instantiated without history.")
 
     @property
-    def max(self):
+    def max(self) -> float:
         return self._max
 
 
-def make_meters(history):
+def make_meters(history: History) -> Dict[str, object]:
     try:
         returns = history["returns"]
     except KeyError:
@@ -63,7 +65,7 @@ def make_meters(history):
     )
 
 
-def track_metrics(ep, history, env, val=False, write=True):
+def track_metrics(ep, history, env, val=False, write: bool = True):
     # Update meters
     history["returns"].update(env.episode_return)
     safety = env.get_last_performance()
@@ -118,13 +120,13 @@ class ConfigWrapper(dict):
 class ReplayBuffer(object):
     """A buffer to hold past "experiences" for DQN."""
 
-    def __init__(self, capacity):
+    def __init__(self, capacity) -> None:
         self.capacity = capacity
         self._buffer = collections.deque(maxlen=capacity)
 
-    def add(self, state, action, reward, successor):
+    def add(self, state, action, reward, successor) -> None:
         self._buffer.append([state, action, reward, successor])
 
-    def sample(self, sample_size):
+    def sample(self, sample_size) -> List[Transition]:
         ixs = np.random.choice(len(self._buffer), sample_size)
         return [self._buffer[ix] for ix in ixs]
