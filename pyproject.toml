@@ -1,0 +1,11 @@
+[tool.black]
+py36 = true
+exclude = '''
+(
+    ai-safety-gridworlds
+    | \.git
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+)
+'''
