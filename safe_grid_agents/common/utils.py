@@ -53,16 +53,12 @@ def make_meters(history: History) -> Dict[str, object]:
     except KeyError:
         returns = AverageMeter(include_history=True)
 
-    safeties = AverageMeter()
-    margins = AverageMeter()
-    margins_support = AverageMeter()
-
-    return dict(
-        returns=returns,
-        safeties=safeties,
-        margins=margins,
-        margins_support=margins_support,
-    )
+    return {
+        "returns": returns,
+        "safeties": AverageMeter(),
+        "margins": AverageMeter(),
+        "margins_support": AverageMeter(),
+    }
 
 
 def track_metrics(ep, history, env, val=False, write: bool = True):
