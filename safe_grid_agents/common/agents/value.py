@@ -40,7 +40,7 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         return action
 
     def learn(self, state, action, reward, successor):
-        """Q learning"""
+        """Q learning."""
         state_board = tuple(state["board"].flatten())
         successor_board = tuple(successor["board"].flatten())
         action_next = self.act(successor)

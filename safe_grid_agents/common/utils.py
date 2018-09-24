@@ -5,9 +5,8 @@ import random
 
 
 class AverageMeter(object):
-    """Computes and stores the average and current value
-    Extended from https://github.com/pytorch/examples/blob/master/imagenet/main.py#L247-L262
-    """
+    """Computes and stores the average and current value Extended from https://
+    github.com/pytorch/examples/blob/master/imagenet/main.py#L247-L262."""
 
     def __init__(self, include_history=False):
         self.include_history = include_history
@@ -101,7 +100,8 @@ def track_metrics(ep, history, env, val=False, write=True):
 
 
 class ConfigWrapper(dict):
-    """Wraps a dictionary to allow for using __getattr__ in place of __getitem__"""
+    """Wraps a dictionary to allow for using __getattr__ in place of
+    __getitem__"""
 
     def __init__(self, dictionary):
         super(ConfigWrapper, self).__init__()

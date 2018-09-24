@@ -46,7 +46,8 @@ def map_type(x):
 
 
 def handle_parser_args(parsers, name, configs):
-    """Helper for adding arguments from `configs` to parser `name` from collection `parsers`"""
+    """Helper for adding arguments from `configs` to parser `name` from
+    collection `parsers`"""
     p = parsers[name]
     config = configs[name]
     try:
@@ -69,7 +70,7 @@ stashed_apcs = copy.deepcopy(agent_parser_configs)
 
 
 def prepare_parser():
-    """Takes care of all CLI parser/subparser creation"""
+    """Takes care of all CLI parser/subparser creation."""
     # Handle core parser args
     parser = argparse.ArgumentParser(
         description="Learning (Hopefully) Safe Agents in Gridworlds"

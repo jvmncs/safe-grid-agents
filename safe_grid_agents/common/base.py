@@ -2,7 +2,10 @@ import abc
 
 
 class BaseActor(object):
-    """Mixin for actors.  All agents must inherit."""
+    """Mixin for actors.
+
+    All agents must inherit.
+    """
 
     __metaclass__ = abc.ABCMeta
 
@@ -13,21 +16,27 @@ class BaseActor(object):
 
 
 class BaseExplorer(object):
-    """Mixin for actors who can explore.  Optional."""
+    """Mixin for actors who can explore.
+
+    Optional.
+    """
 
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def act_explore(self, state, *args, **kwargs):
-        """
-        Choose an action from the current state and return the choice.
+        """Choose an action from the current state and return the choice.
+
         Meant for taking actions more exploratorily than usual.
         """
         return
 
 
 class BaseLearner(object):
-    """Mixin for learners.  Not strictly necessary, but advisable."""
+    """Mixin for learners.
+
+    Not strictly necessary, but advisable.
+    """
 
     __metaclass__ = abc.ABCMeta
 

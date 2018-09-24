@@ -5,7 +5,7 @@ import random
 
 
 class RandomAgent(base.BaseActor):
-    """Random walk"""
+    """Random walk."""
 
     def __init__(self, env, args):
         self.action_n = int(env.action_spec().maximum + 1)

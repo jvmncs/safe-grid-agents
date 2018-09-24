@@ -5,7 +5,7 @@ from collections import defaultdict
 
 
 def dqn_warmup(agent, env, history, args):
-    """Warm start for DQN agent"""
+    """Warm start for DQN agent."""
     rando = RandomAgent(env, args)  # Exploration only
     print("#### WARMUP ####\n")
     done = True

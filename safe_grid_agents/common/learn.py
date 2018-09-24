@@ -3,7 +3,7 @@ import copy
 
 
 def dqn_learn(t, agent, env, env_state, history, args):
-    """Learning loop for DeepQAgent"""
+    """Learning loop for DeepQAgent."""
     step_type, reward, discount, state = env_state
     state = copy.deepcopy(state)
 
@@ -30,7 +30,7 @@ def dqn_learn(t, agent, env, env_state, history, args):
 
 
 def tabq_learn(t, agent, env, env_state, history, args):
-    """Learning loop for TabularQAgent"""
+    """Learning loop for TabularQAgent."""
     step_type, reward, discount, state = env_state
     state = copy.deepcopy(state)
 

@@ -7,8 +7,8 @@ import numpy as np
 
 
 class TabularSSQAgent(agents.TabularQAgent):
-    """
-    A tabular Q-learner for SSRL in CRMDPs.
+    """A tabular Q-learner for SSRL in CRMDPs.
+
     Loosely inspired by the quantilising agent from Everitt et al. 2017,
     but with a Bayesian estimate of the corruption C.
     """
@@ -32,7 +32,7 @@ class TabularSSQAgent(agents.TabularQAgent):
         return action
 
     def learn(self, state, action, reward, successor):
-        """Q learning with corruption map"""
+        """Q learning with corruption map."""
         state_board = tuple(state["board"].flatten())
         successor_board = tuple(successor["board"].flatten())
         reward_estimate = reward * (1 - self.C[state_board])
@@ -43,7 +43,7 @@ class TabularSSQAgent(agents.TabularQAgent):
 
     # Semi-supervised corruption learning
     def query_H(self, env):
-        """Query H, a more informed agent"""
+        """Query H, a more informed agent."""
         self.budget -= 1
         return env.get_last_performance()
 
