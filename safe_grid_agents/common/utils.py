@@ -1,7 +1,6 @@
 import bisect
 import collections
 import numpy as np
-import random
 from typing import Dict, List
 
 from ..types import History, Transition
@@ -33,7 +32,7 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
         if self._history is not None:
-            for x in range(n):
+            for _ in range(n):
                 bisect.insort(self._history, val)
 
     def quantile(self, delta: float) -> np.ndarray:
