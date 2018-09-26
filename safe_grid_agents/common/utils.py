@@ -3,7 +3,8 @@ import collections
 import numpy as np
 import random
 from typing import Dict, List
-from types import History, Transition
+
+from ..types import History, Transition
 
 
 class AverageMeter(object):

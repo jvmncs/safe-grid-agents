@@ -1,6 +1,6 @@
 # Value Agents
-from . import base
-from . import utils
+from .. import base
+from .. import utils
 
 from collections import defaultdict
 import numpy as np
