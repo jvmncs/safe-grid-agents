@@ -62,7 +62,7 @@ def handle_parser_args(parsers, name, configs):
             argattrs = {k: map_type(v) for k, v in config.pop(key).items()}
             alias = argattrs.pop("alias")
             p.add_argument(f"-{alias}", f"--{key}", **argattrs)
-    except AttributeError as e:
+    except AttributeError:
         return
 
 

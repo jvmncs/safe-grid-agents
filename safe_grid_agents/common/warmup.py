@@ -10,7 +10,7 @@ def dqn_warmup(agent, env, history, args):
     print("#### WARMUP ####\n")
     done = True
 
-    for i in range(args.replay_capacity):
+    for _ in range(args.replay_capacity):
         if done:
             history["returns"].update(env.episode_return)
             (step_type, reward, discount, state), done = env.reset(), False
