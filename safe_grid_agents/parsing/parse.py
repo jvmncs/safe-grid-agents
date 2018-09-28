@@ -90,7 +90,7 @@ def prepare_parser():
     )
     env_subparsers.required = True
     env_parsers = {}
-    for env_name in env_map.keys():
+    for env_name in env_map:
         env_parsers[env_name] = env_subparsers.add_parser(env_name)
         handle_parser_args(env_parsers, env_name, env_parser_configs)
 
@@ -103,7 +103,7 @@ def prepare_parser():
         )
         agent_subparsers[env_name].required = True
         agent_parsers = {}
-        for agent_name in agent_map.keys():
+        for agent_name in agent_map:
             agent_parsers[agent_name] = agent_subparsers[env_name].add_parser(
                 agent_name
             )
