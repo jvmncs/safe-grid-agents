@@ -9,12 +9,19 @@ from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvi
 from ai_safety_gridworlds.environments.side_effects_sokoban import (
     SideEffectsSokobanEnvironment
 )
-from safe_grid_agents.common.agents import *
+from safe_grid_agents.common.agents import (
+    RandomAgent,
+    SingleActionAgent,
+    TabularQAgent,
+    DeepQAgent,
+)
 from safe_grid_agents.ssrl import TabularSSQAgent
 from . import core_config, env_config, agent_config
+from typing import Dict
+from ..types import Env, EnvName, Agent, AgentName
 
 # Mapping of envs/agents to Python classes
-env_map = {
+env_map: Dict[EnvName, Env] = {
     # 'super':AbsentSupervisorEnvironment,
     "boat": BoatRaceEnvironment,
     # 'belt':ConveyorBeltEnvironment,
@@ -26,7 +33,7 @@ env_map = {
     "tomato": TomatoWateringEnvironment,
     # 'whisky':WhiskyOrGoldEnvironment,
 }
-agent_map = {
+agent_map: Dict[AgentName, Agent] = {
     "random": RandomAgent,
     "single": SingleActionAgent,
     "tabular-q": TabularQAgent,
@@ -34,8 +41,8 @@ agent_map = {
     "tabular-ssq": TabularSSQAgent,
 }
 
-# yaml conversion helper
-type_map = {"float": float, "int": int, "str": str}
+# YAML conversion helper
+type_map: Dict[str, type] = {"float": float, "int": int, "str": str}
 
 
 def map_type(x):

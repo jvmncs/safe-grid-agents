@@ -142,7 +142,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
             self.epsilon = self.future_eps.pop(0)
         return self.epsilon
 
-    def build_Q(self, n_input, n_layers, n_hidden):
+    def build_Q(self, n_input: int, n_layers: int, n_hidden: int) -> nn.Sequential:
         first = nn.Sequential(nn.Linear(n_input, n_hidden), nn.ReLU())
         hidden = nn.Sequential(
             *tuple(

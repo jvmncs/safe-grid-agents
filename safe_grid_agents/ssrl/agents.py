@@ -47,7 +47,7 @@ class TabularSSQAgent(agents.TabularQAgent):
         self.budget -= 1
         return env.get_last_performance()
 
-    def learn_C(self, corrupt_episode):
+    def learn_C(self, corrupt_episode: bool):
         """Learn probability of being in a corrupt state (Bayesian update)"""
         for state in self._history:
             state_board = tuple(state["board"].flatten())
@@ -74,7 +74,7 @@ class TabularSSQAgent(agents.TabularQAgent):
                 self.C[state_board] *= self.episodes / (self.corrupt_episodes + 1)
         self.reset_history(corrupt_episode)
 
-    def reset_history(self, corrupt, increment_episode=True):
+    def reset_history(self, corrupt: bool, increment_episode: bool = True):
         if corrupt:
             self.corrupt_episodes += 1
         if increment_episode:
