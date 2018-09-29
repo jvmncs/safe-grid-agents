@@ -1,11 +1,12 @@
 # Dummy agents
-from . import base
+from .. import base
 
 import random
 
 
 class RandomAgent(base.BaseActor):
-    """Random walk"""
+    """Random walk."""
+
     def __init__(self, env, args):
         self.action_n = int(env.action_spec().maximum + 1)
         if args.seed:
@@ -17,9 +18,10 @@ class RandomAgent(base.BaseActor):
 
 class SingleActionAgent(base.BaseActor):
     """Always chooses a single boring action (for testing)"""
+
     def __init__(self, env, args):
         self.action = args.action
-        assert self.action <  env.action_spec().maximum + 1, "Not a valid action."
+        assert self.action < env.action_spec().maximum + 1, "Not a valid action."
 
     def act(self, state):
         return self.action

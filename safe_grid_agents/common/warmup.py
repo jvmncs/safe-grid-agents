@@ -3,15 +3,16 @@ import safe_grid_agents.common.utils as ut
 from safe_grid_agents.common.agents import RandomAgent
 from collections import defaultdict
 
+
 def dqn_warmup(agent, env, history, args):
-    """Warm start for DQN agent"""
-    rando = RandomAgent(env, args) # Exploration only
+    """Warm start for DQN agent."""
+    rando = RandomAgent(env, args)  # Exploration only
     print("#### WARMUP ####\n")
     done = True
 
-    for i in range(args.replay_capacity):
+    for _ in range(args.replay_capacity):
         if done:
-            history['returns'].update(env.episode_return)
+            history["returns"].update(env.episode_return)
             (step_type, reward, discount, state), done = env.reset(), False
 
         action = rando.act(None)
@@ -21,10 +22,11 @@ def dqn_warmup(agent, env, history, args):
 
     return agent, env, history, args
 
+
 def noop(agent, env, history, args):
     return agent, env, history, args
 
-warmup_map = defaultdict(lambda: noop, {
-    'tabular-ssq':ss.random_warmup,
-    'deep-q':dqn_warmup,
-})
+
+warmup_map = defaultdict(
+    lambda: noop, {"tabular-ssq": ss.random_warmup, "deep-q": dqn_warmup}
+)

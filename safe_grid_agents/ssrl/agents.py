@@ -7,21 +7,24 @@ import numpy as np
 
 
 class TabularSSQAgent(agents.TabularQAgent):
-    """
-    A tabular Q-learner for SSRL in CRMDPs.
+    """A tabular Q-learner for SSRL in CRMDPs.
+
     Loosely inspired by the quantilising agent from Everitt et al. 2017,
     but with a Bayesian estimate of the corruption C.
     """
+
     def __init__(self, env, args):
         super(self.__class__, self).__init__(env, args)
 
         # SSRL
         self.budget = args.budget
         self.C = defaultdict(lambda: args.C_prior)
-        self.C_support = defaultdict(lambda: 0) # only over visited states, value is number of times visited
+        self.C_support = defaultdict(
+            lambda: 0
+        )  # only over visited states, value is number of times visited
         self.corrupt_episodes = 0
         self.episodes = 0
-        self.reset_history(False, False) # Corruption learning needs episode history
+        self.reset_history(False, False)  # Corruption learning needs episode history
 
     def act_explore(self, state):
         action = super(self.__class__, self).act_explore(state)
@@ -29,9 +32,9 @@ class TabularSSQAgent(agents.TabularQAgent):
         return action
 
     def learn(self, state, action, reward, successor):
-        """Q learning with corruption map"""
-        state_board = tuple(state['board'].flatten())
-        successor_board = tuple(successor['board'].flatten())
+        """Q learning with corruption map."""
+        state_board = tuple(state["board"].flatten())
+        successor_board = tuple(successor["board"].flatten())
         reward_estimate = reward * (1 - self.C[state_board])
         action_next = self.act(successor_board)
         target = reward_estimate + self.discount * self.Q[successor_board][action_next]
@@ -40,16 +43,16 @@ class TabularSSQAgent(agents.TabularQAgent):
 
     # Semi-supervised corruption learning
     def query_H(self, env):
-        """Query H, a more informed agent"""
+        """Query H, a more informed agent."""
         self.budget -= 1
         return env.get_last_performance()
 
-    def learn_C(self, corrupt_episode):
+    def learn_C(self, corrupt_episode: bool):
         """Learn probability of being in a corrupt state (Bayesian update)"""
         for state in self._history:
-            state_board = tuple(state['board'].flatten())
+            state_board = tuple(state["board"].flatten())
             if not corrupt_episode:
-                self.C[state_board] *= 0 # P(C | ~E) = 0
+                self.C[state_board] *= 0  # P(C | ~E) = 0
                 try:
                     del self.C_support[state_board]
                 except KeyError:
@@ -68,10 +71,10 @@ class TabularSSQAgent(agents.TabularQAgent):
                 #   =~ self.C[state] / (N(corrupt_episodes)/N(episodes))
                 #   == self.C[state] * N(episodes) / N(corrupt_episodes)
 
-                self.C[state_board]  *= self.episodes / (self.corrupt_episodes + 1)
+                self.C[state_board] *= self.episodes / (self.corrupt_episodes + 1)
         self.reset_history(corrupt_episode)
 
-    def reset_history(self, corrupt, increment_episode=True):
+    def reset_history(self, corrupt: bool, increment_episode: bool = True):
         if corrupt:
             self.corrupt_episodes += 1
         if increment_episode:
@@ -80,4 +83,4 @@ class TabularSSQAgent(agents.TabularQAgent):
 
     def update_global_prior(self):
         # (Current expectation of q/|state_space| based on previously visited states)
-        self.C.default_factory = lambda: len(self.C_support)/len(self.C)
+        self.C.default_factory = lambda: len(self.C_support) / len(self.C)

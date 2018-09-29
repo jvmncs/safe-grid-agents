@@ -9,7 +9,7 @@ import errno
 import time
 from tensorboardX import SummaryWriter
 
-if __name__=='__main__':
+if __name__ == "__main__":
     parser = prepare_parser()
     args = parser.parse_args()
 
@@ -18,7 +18,7 @@ if __name__=='__main__':
         if not os.path.exists(args.log_dir):
             try:
                 os.makedirs(args.log_dir)
-            except OSError as exc: # Guard against race condition
+            except OSError as exc:  # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
     except TypeError:
@@ -35,8 +35,8 @@ if __name__=='__main__':
     history = ut.make_meters({})
     eval_history = ut.make_meters({})
     writer = SummaryWriter(args.log_dir)
-    history['writer'] = writer
-    eval_history['writer'] = writer
+    history["writer"] = writer
+    eval_history["writer"] = writer
 
     # Instantiate, warmup
     env = env_class()
@@ -47,7 +47,7 @@ if __name__=='__main__':
     eval_next = False
     done = True
     episode = 0
-    eval_history['period'] = 0
+    eval_history["period"] = 0
     for t in range(args.timesteps):
         if done:
             history = ut.track_metrics(episode, history, env)
