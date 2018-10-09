@@ -29,10 +29,11 @@ def dqn_learn(agent, env, env_state, history, args):
     return (step_type, reward, discount, successor), history
 
 
-def tabq_learn(t, agent, env, env_state, history, args):
+def tabq_learn(agent, env, env_state, history, args):
     """Learning loop for TabularQAgent."""
     step_type, reward, discount, state = env_state
     state = copy.deepcopy(state)
+    t = history["t"]
 
     # Act
     action = agent.act_explore(state)

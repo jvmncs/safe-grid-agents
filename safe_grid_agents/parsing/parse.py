@@ -23,7 +23,7 @@ from typing import Dict
 from ..types import Env, EnvName, Agent, AgentName
 
 # Mapping of envs/agents to Python classes
-env_map: Dict[EnvName, Env] = {
+env_map = {  # Dict[EnvName, Env]
     # 'super':AbsentSupervisorEnvironment,
     "boat": BoatRaceEnvironment,
     # 'belt':ConveyorBeltEnvironment,
@@ -35,7 +35,7 @@ env_map: Dict[EnvName, Env] = {
     "tomato": TomatoWateringEnvironment,
     # 'whisky':WhiskyOrGoldEnvironment,
 }
-agent_map: Dict[AgentName, Agent] = {
+agent_map = {  # Dict[AgentName, Agent]
     "random": RandomAgent,
     "single": SingleActionAgent,
     "tabular-q": TabularQAgent,
@@ -44,7 +44,7 @@ agent_map: Dict[AgentName, Agent] = {
 }
 
 # YAML conversion helper
-type_map: Dict[str, type] = {"float": float, "int": int, "str": str}
+type_map = {"float": float, "int": int, "str": str}  # Dict[str, type]
 
 
 def map_type(x):
@@ -62,7 +62,7 @@ def handle_parser_args(parsers, name, configs):
         for key in list(config.keys()):
             argattrs = {k: map_type(v) for k, v in config.pop(key).items()}
             alias = argattrs.pop("alias")
-            p.add_argument(f"-{alias}", f"--{key}", **argattrs)
+            p.add_argument("-{}".format(alias), "--{}".format(key), **argattrs)
     except AttributeError:
         return
 

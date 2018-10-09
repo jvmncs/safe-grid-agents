@@ -31,3 +31,7 @@ core:
     alias: L
     type: str
     help: "Subdirectory to write logs to for this run (uses tensorboardX's default)"
+  disable-cuda:
+    alias: dc
+    action: store_true
+    help: "Disable CUDA computations (default: False)"

@@ -57,10 +57,6 @@ deep-q:
     type: int
     default: 0
     help: "If using CUDA, which device to use for DQN in PyTorch (default: 0)"
-  disable-cuda:
-    alias: dc
-    action: store_true
-    help: "Disable CUDA computations (default: False)"
   log-gradients:
     alias: lg
     action: store_true
