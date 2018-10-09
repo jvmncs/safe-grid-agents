@@ -1,5 +1,4 @@
-import torch
-from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
+"""Containers useful for storing agent experiences."""
 import numpy as np
 import collections
 

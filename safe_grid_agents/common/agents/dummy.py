@@ -1,11 +1,11 @@
-# Dummy agents
+"""Dummy agents for development."""
 from . import base
 
 import random
 
 
 class RandomAgent(base.BaseActor):
-    """Random walk."""
+    """Random walker."""
 
     def __init__(self, env, args):
         self.action_n = int(env.action_spec().maximum + 1)
@@ -17,7 +17,7 @@ class RandomAgent(base.BaseActor):
 
 
 class SingleActionAgent(base.BaseActor):
-    """Always chooses a single boring action (for testing)"""
+    """Always chooses a single boring action (for testing)."""
 
     def __init__(self, env, args):
         self.action = args.action

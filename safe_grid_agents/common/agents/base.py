@@ -1,3 +1,4 @@
+"""Base classes for agents."""
 import abc
 
 

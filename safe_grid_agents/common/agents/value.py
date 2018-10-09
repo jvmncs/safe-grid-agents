@@ -1,6 +1,7 @@
-# Value Agents
+"""Value-based agents."""
 from . import base
 from .. import utils
+from ..types import History, Experiences
 
 from collections import defaultdict
 import numpy as np
@@ -51,6 +52,7 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.Q[state_board][action] += self.lr * differential
 
     def update_epsilon(self):
+        """Update epsilon exploration constant."""
         if len(self.future_eps) > 0:
             self.epsilon = self.future_eps.pop(0)
         return self.epsilon
@@ -60,7 +62,6 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
     """Q-learner with deep function approximation."""
 
     def __init__(self, env, args):
-        super(DeepQAgent, self).__init__()
         self.action_n = int(env.action_spec().maximum + 1)
         board_shape = env.observation_spec()["board"].shape
         self.n_input = board_shape[0] * board_shape[1]
@@ -100,6 +101,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         return policy.sample().item()
 
     def policy(self, state):
+        """Produce the entire policy distribution over actions for a state."""
         argmax = self.act(state)
         probs = (
             torch.zeros(
@@ -113,7 +115,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         probs[argmax] += 1 - self.epsilon
         return Categorical(probs=probs)
 
-    def learn(self, state, action, reward, successor, history):
+    def learn(self, state, action, reward, successor, history) -> History:
         self.replay.add(state, action, reward, successor)
         states, _, rewards, successors, terminal_mask = self.process(
             self.replay.sample(self.batch_size)
@@ -132,22 +134,25 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         nn.utils.clip_grad_norm_(self.Q.parameters(), 10.0)
         if self.log_gradients:
             for name, param in self.Q.named_parameters():
-                writer.add_histogram(
-                    name, param.grad.clone().cpu().data.numpy(), n_iter
+                history["writer"].add_histogram(
+                    name, param.grad.clone().cpu().data.numpy(), history["t"]
                 )
         self.optim.step()
         self.Q.eval()
         return history
 
-    def sync_target_Q(self):
+    def sync_target_Q(self) -> None:
+        """Sync target network with most recent behavior network."""
         self.target_Q.load_state_dict(self.Q.state_dict())
 
-    def update_epsilon(self):
+    def update_epsilon(self) -> float:
+        """Update epsilon exploration constant."""
         if len(self.future_eps) > 0:
             self.epsilon = self.future_eps.pop(0)
         return self.epsilon
 
     def build_Q(self, n_input: int, n_layers: int, n_hidden: int) -> nn.Sequential:
+        """Build a single Q network."""
         first = nn.Sequential(nn.Linear(n_input, n_hidden), nn.ReLU())
         hidden = nn.Sequential(
             *tuple(
@@ -158,7 +163,8 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         last = nn.Linear(n_hidden, int(self.action_n))
         return nn.Sequential(first, hidden, last)
 
-    def process(self, experiences):
+    def process(self, experiences) -> Experiences:
+        """Convert gridworld representations to torch Tensors."""
         actions = None
         boards = [experience[0]["board"].flatten() for experience in experiences]
         boards = torch.tensor(

@@ -1,6 +1,4 @@
-import yaml
-import argparse
-import copy
+"""Auto-constructs a CLI from relevant YAML config files."""
 import sys
 
 sys.path.append("ai-safety-gridworlds/")
@@ -9,6 +7,7 @@ from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvi
 from ai_safety_gridworlds.environments.side_effects_sokoban import (
     SideEffectsSokobanEnvironment,
 )
+
 from safe_grid_agents.common.agents import (
     RandomAgent,
     SingleActionAgent,
@@ -17,6 +16,9 @@ from safe_grid_agents.common.agents import (
 )
 from safe_grid_agents.ssrl import TabularSSQAgent
 from . import core_config, env_config, agent_config
+import yaml
+import argparse
+import copy
 from typing import Dict
 from ..types import Env, EnvName, Agent, AgentName
 
@@ -53,8 +55,7 @@ def map_type(x):
 
 
 def handle_parser_args(parsers, name, configs):
-    """Helper for adding arguments from `configs` to parser `name` from
-    collection `parsers`"""
+    """Assist adding arguments from `configs` to parser `name` from collection `parsers`."""
     p = parsers[name]
     config = configs[name]
     try:
@@ -77,7 +78,7 @@ stashed_apcs = copy.deepcopy(agent_parser_configs)
 
 
 def prepare_parser():
-    """Takes care of all CLI parser/subparser creation."""
+    """Create all CLI parsers/subparsers."""
     # Handle core parser args
     parser = argparse.ArgumentParser(
         description="Learning (Hopefully) Safe Agents in Gridworlds"

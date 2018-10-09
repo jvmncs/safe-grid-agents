@@ -1,5 +1,5 @@
+"""Agent-specific warmup interactions."""
 import safe_grid_agents.ssrl.warmup as ss
-import safe_grid_agents.common.utils as ut
 from safe_grid_agents.common.agents import RandomAgent
 from collections import defaultdict
 

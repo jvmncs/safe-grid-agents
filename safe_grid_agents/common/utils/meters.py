@@ -1,3 +1,5 @@
+"""Utilities dealing with meters and tracking metrics."""
+
 import bisect
 import numpy as np
 

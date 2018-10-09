@@ -1,8 +1,10 @@
+"""Agent-specific evaluation interactions."""
 from . import utils as ut
 from collections import defaultdict
 
 
 def default_eval(agent, env, eval_history, args):
+    """Evaluate an agent (default interaction)."""
     print("#### EVAL ####")
     eval_over = False
     episode = 0

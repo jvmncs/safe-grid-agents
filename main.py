@@ -1,3 +1,4 @@
+"""Main safe-grid-agents script with CLI."""
 from safe_grid_agents.parsing import prepare_parser, env_map, agent_map
 from safe_grid_agents.common.warmup import warmup_map
 from safe_grid_agents.common.learn import learn_map
@@ -5,7 +6,6 @@ from safe_grid_agents.common.eval import eval_map
 from safe_grid_agents.common import utils as ut
 
 import os
-import errno
 import time
 from tensorboardX import SummaryWriter
 

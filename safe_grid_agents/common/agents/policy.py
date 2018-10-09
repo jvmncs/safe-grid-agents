@@ -1,17 +1,17 @@
 """Policy gradient and actor-critic agents."""
-
 from . import base
 from ..utils import Rollout
 
+from typing import Tuple
 import torch
 import torch.nn as nn
 from torch.distributions import Categorical
 
 
-class PPO(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
+class PPOAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
     """Actor-critic variant of PPO."""
 
-    def __init__(self, env, args):
+    def __init__(self, env, args) -> None:
         self.action_n = int(env.action_spec().maximum + 1)
         self.discount = args.discount
         board_shape = env.observation_spec()["board"].shape
@@ -28,7 +28,7 @@ class PPO(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.eval()
         self.rollouts = Rollout(states=[], actions=[], rewards=[])
 
-    def act(self, state):
+    def act(self, state) -> torch.Tensor:
         state_board = torch.tensor(
             state["board"].flatten(),
             requires_grad=False,
@@ -38,11 +38,11 @@ class PPO(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
         p, _ = self.forward(state_board)
         return p.argmax(-1)
 
-    def act_explore(self, state):
+    def act_explore(self, state) -> torch.Tensor:
         policy = self.policy(state)
         return policy.sample().item()
 
-    def policy(self, state):
+    def policy(self, state) -> Categorical:
         state_board = torch.tensor(
             state["board"].flatten(),
             requires_grad=False,
@@ -56,7 +56,7 @@ class PPO(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
         # TODO
         raise NotImplementedError
 
-    def build_ac(self):
+    def build_ac(self) -> None:
         """Build the fused actor-critic architecture."""
         first = nn.Sequential(nn.Linear(self.n_input, self.n_hidden), nn.ReLU())
         hidden = nn.Sequential(
@@ -69,7 +69,7 @@ class PPO(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.actor = nn.Linear(self.n_hidden, int(self.action_n))
         self.critic = nn.Linear(self.n_hidden, 1)
 
-    def forward(self, x):
+    def forward(self, x) -> Tuple[torch.Tensor, torch.Tensor]:
         x = self.network(x)
         actor = self.actor(x)
         critic = self.critic(x)

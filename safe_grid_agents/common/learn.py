@@ -1,4 +1,4 @@
-from collections import defaultdict
+"""Agent-specific learning interactions."""
 import copy
 
 
