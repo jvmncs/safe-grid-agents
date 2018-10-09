@@ -12,6 +12,8 @@ from tensorboardX import SummaryWriter
 if __name__ == "__main__":
     parser = prepare_parser()
     args = parser.parse_args()
+    if args.disable_cuda:
+        args.device = "cpu"
 
     # Create logging directory
     # The try/except is there in case log_dir is None,

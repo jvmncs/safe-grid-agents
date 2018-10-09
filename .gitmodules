@@ -3,5 +3,5 @@
 	url = https://github.com/deepmind/pycolab.git
 [submodule "ai-safety-gridworlds"]
 	path = ai-safety-gridworlds
-	url = git@github.com:deepmind/ai-safety-gridworlds.git
+	url = https://github.com/deepmind/ai-safety-gridworlds.git
 	branch = master

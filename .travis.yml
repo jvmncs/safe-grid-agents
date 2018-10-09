@@ -1,13 +1,6 @@
 python:
   - 3.6
 dist: xenial
-# Handle git submodules yourself
-git:
-    submodules: false
-# Use sed to replace the SSH URL with the public URL, then initialize submodules
-before_install:
-    - git config --global url."https://github.com/".insteadOf "git@github.com:"
-    - git submodule update --init --recursive
 cache: pip
 install: 'pip install black'
 language: python

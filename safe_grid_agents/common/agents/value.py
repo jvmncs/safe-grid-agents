@@ -1,7 +1,7 @@
 """Value-based agents."""
 from . import base
 from .. import utils
-from ..types import History, Experiences
+from ...types import History, Experiences
 
 from collections import defaultdict
 import numpy as np
@@ -194,6 +194,6 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
             except KeyError:
                 terminals.append(0)
         terminal_mask = torch.tensor(
-            terminals, requires_grad=True, dtype=torch.uint8, device=self.device
+            terminals, requires_grad=False, dtype=torch.uint8, device=self.device
         )
         return boards, actions, rewards, successor_boards, terminal_mask

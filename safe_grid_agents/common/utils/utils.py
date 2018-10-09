@@ -12,5 +12,5 @@ class ConfigWrapper(dict):
     def __getattribute__(self, attr):
         try:
             return self[attr]
-        except TypeError, KeyError:
+        except (TypeError, KeyError):
             return super(ConfigWrapper, self).__getattribute__(attr)
