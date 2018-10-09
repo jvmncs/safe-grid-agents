@@ -2,10 +2,11 @@ from collections import defaultdict
 import copy
 
 
-def dqn_learn(t, agent, env, env_state, history, args):
+def dqn_learn(agent, env, env_state, history, args):
     """Learning loop for DeepQAgent."""
     step_type, reward, discount, state = env_state
     state = copy.deepcopy(state)
+    t = history["t"]
 
     # Act
     action = agent.act_explore(state)
@@ -15,8 +16,7 @@ def dqn_learn(t, agent, env, env_state, history, args):
     if args.cheat:
         # TODO: fix this, since _get_hidden_reward seems to be episodic
         reward = env._get_hidden_reward()
-    loss = agent.learn(state, action, reward, successor)
-    history["writer"].add_scalar("Train/loss", loss, t)
+    history = agent.learn(state, action, reward, successor, history)
 
     # Modify exploration
     eps = agent.update_epsilon()

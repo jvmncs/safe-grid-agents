@@ -1,5 +1,5 @@
 # Value Agents
-from .. import base
+from . import base
 from .. import utils
 
 from collections import defaultdict
@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
+from torch.distributions import Categorical
 
 
 # Baseline agents
@@ -16,6 +16,7 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
 
     def __init__(self, env, args):
         self.action_n = int(env.action_spec().maximum + 1)
+        self.discount = args.discount
 
         # Agent definition
         self.future_eps = [
@@ -64,6 +65,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         board_shape = env.observation_spec()["board"].shape
         self.n_input = board_shape[0] * board_shape[1]
         self.device = args.device
+        self.log_gradients = args.log_gradients
 
         # Agent definition
         self.future_eps = [
@@ -94,11 +96,8 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         return scores.argmax(1)
 
     def act_explore(self, state):
-        if (torch.rand(1) < self.epsilon).all():
-            action = torch.ones(self.action_n).multinomial(1)
-        else:
-            action = self.act(state)
-        return action.item()
+        policy = self.policy(state)
+        return policy.sample().item()
 
     def policy(self, state):
         argmax = self.act(state)
@@ -112,9 +111,9 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
             + self.epsilon / self.action_n
         )
         probs[argmax] += 1 - self.epsilon
-        return probs
+        return Categorical(probs=probs)
 
-    def learn(self, state, action, reward, successor):
+    def learn(self, state, action, reward, successor, history):
         self.replay.add(state, action, reward, successor)
         states, _, rewards, successors, terminal_mask = self.process(
             self.replay.sample(self.batch_size)
@@ -126,13 +125,19 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         next_Qs[terminal_mask] = 0
         expected_Qs = self.discount * next_Qs + rewards
         loss = F.mse_loss(Qs, expected_Qs)
+        history["writer"].add_scalar("Train/loss", loss.item(), history["t"])
 
         self.optim.zero_grad()
         loss.backward()
         nn.utils.clip_grad_norm_(self.Q.parameters(), 10.0)
+        if self.log_gradients:
+            for name, param in self.Q.named_parameters():
+                writer.add_histogram(
+                    name, param.grad.clone().cpu().data.numpy(), n_iter
+                )
         self.optim.step()
         self.Q.eval()
-        return loss.item()
+        return history
 
     def sync_target_Q(self):
         self.target_Q.load_state_dict(self.Q.state_dict())

@@ -1,5 +1,5 @@
 # Dummy agents
-from .. import base
+from . import base
 
 import random
 

@@ -14,13 +14,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Create logging directory
+    # The try/except is there in case log_dir is None,
+    # in which case we use the TensorboardX default
     try:
         if not os.path.exists(args.log_dir):
-            try:
-                os.makedirs(args.log_dir)
-            except OSError as exc:  # Guard against race condition
-                if exc.errno != errno.EEXIST:
-                    raise
+            os.makedirs(args.log_dir, exist_ok=True)
     except TypeError:
         args.log_dir = None
 
@@ -49,6 +47,7 @@ if __name__ == "__main__":
     episode = 0
     eval_history["period"] = 0
     for t in range(args.timesteps):
+        history["t"] = t
         if done:
             history = ut.track_metrics(episode, history, env)
             env_state, done = env.reset(), False
@@ -57,7 +56,7 @@ if __name__ == "__main__":
                 eval_history = eval_fn(agent, env, eval_history, args)
                 eval_next = False
             time0 = time.time()
-        env_state, history = learn_fn(t, agent, env, env_state, history, args)
+        env_state, history = learn_fn(agent, env, env_state, history, args)
 
         done = env_state[0].value == 2
         if t % args.eval_every == args.eval_every - 1:

@@ -7,7 +7,7 @@ sys.path.append("ai-safety-gridworlds/")
 from ai_safety_gridworlds.environments.boat_race import BoatRaceEnvironment
 from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvironment
 from ai_safety_gridworlds.environments.side_effects_sokoban import (
-    SideEffectsSokobanEnvironment
+    SideEffectsSokobanEnvironment,
 )
 from safe_grid_agents.common.agents import (
     RandomAgent,

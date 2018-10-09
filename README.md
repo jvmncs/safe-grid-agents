@@ -1,14 +1,16 @@
 # safe-grid-agents
 
-Training (hopefully) safe agents in gridworlds
+Training (hopefully) safe agents in gridworlds.
+
+Emphasizing extensibility, modularity, and accessibility.
 
 ## Layout
 
 -   `ai-safety-gridworlds`: Submodule of DeepMind's official
     [repo](https://github.com/deepmind/ai-safety-gridworlds).
 -   `safe_grid_agents/common`: Core codebase. Includes abstract base
-    classes for a variety of agents, standard RL agents, their
-    associated warmup functions, and a utilities file.
+    classes for a variety of agents, their associated warmup/learn/eval
+    functions, and a utilities file.
 -   `main.py`: Python executable for composing training jobs.
 -   `safe_grid_agents/parsing`: Helpers that construct a flexible CLI
     for `main.py`.
