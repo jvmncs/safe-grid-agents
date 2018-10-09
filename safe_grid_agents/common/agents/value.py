@@ -1,7 +1,7 @@
 """Value-based agents."""
 from . import base
 from .. import utils
-from ...types import History, Experiences
+from ...types import History, ExperienceBatch
 
 from collections import defaultdict
 import numpy as np
@@ -87,11 +87,8 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.optim = torch.optim.Adam(self.Q.parameters(), lr=args.lr, amsgrad=True)
 
     def act(self, state):
-        state_board = torch.tensor(
-            state["board"].flatten(),
-            requires_grad=False,
-            dtype=torch.float32,
-            device=self.device,
+        state_board = torch.as_tensor(
+            state.flatten(), dtype=torch.float32, device=self.device
         ).reshape(1, -1)
         scores = self.Q(state_board)
         return scores.argmax(1)
@@ -115,16 +112,15 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         probs[argmax] += 1 - self.epsilon
         return Categorical(probs=probs)
 
-    def learn(self, state, action, reward, successor, history) -> History:
-        self.replay.add(state, action, reward, successor)
-        states, _, rewards, successors, terminal_mask = self.process(
+    def learn(self, state, action, reward, successor, terminal, history) -> History:
+        self.replay.add(state, action, reward, successor, terminal)
+        states, actions, rewards, successors, terminals = self.process(
             self.replay.sample(self.batch_size)
         )
         self.Q.train()
-
-        Qs = self.Q(states).max(1)[0]
+        Qs = self.Q(states).gather(1, actions)
         next_Qs = self.target_Q(successors).max(1)[0]
-        next_Qs[terminal_mask] = 0
+        next_Qs[terminals] = 0
         expected_Qs = self.discount * next_Qs + rewards
         loss = F.mse_loss(Qs, expected_Qs)
         history["writer"].add_scalar("Train/loss", loss.item(), history["t"])
@@ -163,37 +159,32 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         last = nn.Linear(n_hidden, int(self.action_n))
         return nn.Sequential(first, hidden, last)
 
-    def process(self, experiences) -> Experiences:
+    def process(self, experiences) -> ExperienceBatch:
         """Convert gridworld representations to torch Tensors."""
-        actions = None
-        boards = [experience[0]["board"].flatten() for experience in experiences]
-        boards = torch.tensor(
-            np.concatenate(boards, axis=0),
-            requires_grad=True,
-            dtype=torch.float32,
-            device=self.device,
-        ).reshape(-1, self.n_input)
-        rewards = [experience[2] for experience in experiences]
-        rewards = torch.tensor(rewards, dtype=torch.float32, device=self.device)
-        successor_boards = [
-            experience[3]["board"].flatten() for experience in experiences
-        ]
-        successor_boards = torch.tensor(
-            np.concatenate(successor_boards, axis=0),
-            requires_grad=True,
-            dtype=torch.float32,
-            device=self.device,
-        ).reshape(-1, self.n_input)
-        terminals = []
-        for experience in experiences:
-            try:
-                if experience[3]["extra_observations"]["termination_reason"].value == 1:
-                    terminals.append(1)
-                else:
-                    terminals.append(0)
-            except KeyError:
-                terminals.append(0)
-        terminal_mask = torch.tensor(
-            terminals, requires_grad=False, dtype=torch.uint8, device=self.device
+        boards = [experience.state.flatten() for experience in experiences]
+        boards = (
+            torch.as_tensor(
+                np.concatenate(boards, axis=0), dtype=torch.float32, device=self.device
+            )
+            .requires_grad_()
+            .reshape(-1, self.n_input)
         )
-        return boards, actions, rewards, successor_boards, terminal_mask
+        actions = [experience.action for experience in experiences]
+        actions = torch.as_tensor(
+            actions, dtype=torch.long, device=self.device
+        ).reshape(-1, 1)
+        rewards = [experience.reward for experience in experiences]
+        rewards = torch.as_tensor(rewards, dtype=torch.float32, device=self.device)
+        successors = [experience.successor.flatten() for experience in experiences]
+        successors = (
+            torch.as_tensor(
+                np.concatenate(successors, axis=0),
+                dtype=torch.float32,
+                device=self.device,
+            )
+            .requires_grad_()
+            .reshape(-1, self.n_input)
+        )
+        terminals = [experience.terminal for experience in experiences]
+        terminals = torch.as_tensor(terminals, dtype=torch.uint8, device=self.device)
+        return boards, actions, rewards, successors, terminals

@@ -1,7 +1,7 @@
 """Dummy agents for development."""
 from . import base
 
-import random
+import numpy as np
 
 
 class RandomAgent(base.BaseActor):
@@ -10,10 +10,10 @@ class RandomAgent(base.BaseActor):
     def __init__(self, env, args):
         self.action_n = int(env.action_spec().maximum + 1)
         if args.seed:
-            random.seed(args.seed)
+            np.random.seed(args.seed)
 
     def act(self, state):
-        return random.randint(0, self.action_n)
+        return np.random.randint(0, self.action_n)
 
 
 class SingleActionAgent(base.BaseActor):

@@ -1,6 +1,6 @@
 """Policy gradient and actor-critic agents."""
 from . import base
-from ..utils import Rollout
+from ...types import Rollout
 
 from typing import Tuple
 import torch

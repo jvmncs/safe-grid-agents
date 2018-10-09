@@ -1,7 +1,9 @@
 """Custom types for safe-grid-agents."""
 # TODO put Transitions in namedtuple/dataclass
-from typing import Dict, Tuple
+from typing import Dict, Tuple, NamedTuple
 import torch
+import numpy as np
+import collections
 
 Transition = object
 History = Dict[str, object]
@@ -12,6 +14,25 @@ Agent = object
 EnvName = str
 Env = object
 
-Experiences = Tuple[
-    torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
-]
+Rollout = collections.namedtuple("Rollout", ["states", "actions", "rewards"])
+Experience = NamedTuple(
+    "Experience",
+    [
+        ("state", np.ndarray),
+        ("action", int),
+        ("reward", float),
+        ("successor", np.ndarray),
+        ("terminal", bool),
+    ],
+)
+
+ExperienceBatch = NamedTuple(
+    "ExperienceBatch",
+    [
+        ("states", torch.Tensor),
+        ("actions", torch.Tensor),
+        ("rewards", torch.Tensor),
+        ("successors", torch.Tensor),
+        ("terminals", torch.Tensor),
+    ],
+)

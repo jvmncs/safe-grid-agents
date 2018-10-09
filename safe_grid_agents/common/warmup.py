@@ -8,17 +8,19 @@ def dqn_warmup(agent, env, history, args):
     """Warm start for DQN agent."""
     rando = RandomAgent(env, args)  # Exploration only
     print("#### WARMUP ####\n")
-    done = True
+    terminal = True
 
     for _ in range(args.replay_capacity):
-        if done:
+        if terminal:
             history["returns"].update(env.episode_return)
-            (step_type, reward, discount, state), done = env.reset(), False
+            (step_type, reward, discount, state), terminal = env.reset(), False
+            board = state["board"]
 
         action = rando.act(None)
         step_type, reward, discount, successor = env.step(action)
-        done = step_type.value == 2
-        agent.replay.add(state, action, reward, successor)
+        succ_board = successor["board"]
+        terminal = step_type.value == 2
+        agent.replay.add(board, action, reward, succ_board, terminal)
 
     return agent, env, history, args
 

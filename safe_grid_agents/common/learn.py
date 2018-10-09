@@ -5,18 +5,26 @@ import copy
 def dqn_learn(agent, env, env_state, history, args):
     """Learning loop for DeepQAgent."""
     step_type, reward, discount, state = env_state
-    state = copy.deepcopy(state)
+    state = copy.deepcopy(state)  # Make sure `state` doesn't change next step
+    board = state["board"]
     t = history["t"]
 
     # Act
-    action = agent.act_explore(state)
+    action = agent.act_explore(board)
     step_type, reward, discount, successor = env.step(action)
+    terminal = env_state[0].value == 2
+    succ_board = successor["board"]
 
     # Learn
     if args.cheat:
         # TODO: fix this, since _get_hidden_reward seems to be episodic
         reward = env._get_hidden_reward()
-    history = agent.learn(state, action, reward, successor, history)
+        # In case the agent is drunk, use the actual action they took
+        try:
+            action = successor["extra_observations"]["actual_actions"]
+        except KeyError:
+            pass
+    history = agent.learn(board, action, reward, succ_board, terminal, history)
 
     # Modify exploration
     eps = agent.update_epsilon()
