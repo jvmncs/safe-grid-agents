@@ -10,16 +10,18 @@ def default_eval(agent, env, eval_history, args):
     episode = 0
     t = 0
     (step_type, reward, discount, state), done = env.reset(), False
+    board = state["board"]
     while True:
         if done:
             eval_history = ut.track_metrics(
                 episode, eval_history, env, val=True, write=False
             )
             (step_type, reward, discount, state), done = env.reset(), False
+            board = state["board"]
             episode += 1
             if eval_over:
                 break
-        action = agent.act(state)
+        action = agent.act(board)
         step_type, reward, discount, successor = env.step(action)
 
         done = step_type.value == 2
