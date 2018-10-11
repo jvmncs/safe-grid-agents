@@ -64,6 +64,9 @@ to visualize an agent's learning.
 
 # Development
 
+## Code style
+We use [black](https://github.com/ambv/black) for auto-formatting according to a consistent style guide.  To auto format, run `black .` from inside the repo folder.  To make this more convenient, you can install plugins for your preferred text editor that auto-format on every save.
+
 ## Adding agents
 
 Steps to take when adding a new agent.
