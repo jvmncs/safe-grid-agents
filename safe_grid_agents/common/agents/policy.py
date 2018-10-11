@@ -30,7 +30,10 @@ class PPOAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.clipping = args.clipping
         # self.gae = args.gae_coeff
         # self.entropy = args.entropy_bonus
+
+        # Network logistics
         self.build_ac()
+        self.to(self.device)
         self.optim = torch.optim.Adam(self.parameters(), self.lr)
         self.old_policy = deepcopy(self)
         self.sync()
