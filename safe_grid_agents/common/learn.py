@@ -36,7 +36,6 @@ def dqn_learn(agent, env, env_state, history, args):
 
     # Learn
     if args.cheat:
-        # TODO: fix this, since _get_hidden_reward seems to be episodic
         current_score = env._get_hidden_reward()
         reward = current_score - history["last_score"]
         history["last_score"] = current_score
@@ -55,7 +54,7 @@ def dqn_learn(agent, env, env_state, history, args):
     if t % args.sync_every == args.sync_every - 1:
         agent.sync_target_Q()
 
-    # Increment timestep for tracking
+    # Increment timestep for future tracking
     history["t"] += 1
 
     return (step_type, reward, discount, successor), history
@@ -76,15 +75,21 @@ def tabq_learn(agent, env, env_state, history, args):
 
     # Learn
     if args.cheat:
-        # TODO: fix this, since _get_hidden_reward seems to be episodic
-        reward = env._get_hidden_reward()
+        current_score = env._get_hidden_reward()
+        reward = current_score - history["last_score"]
+        history["last_score"] = current_score
+        # In case the agent is drunk, use the actual action they took
+        try:
+            action = successor["extra_observations"]["actual_actions"]
+        except KeyError:
+            pass
     agent.learn(board, action, reward, succ_board)
 
     # Modify exploration
     eps = agent.update_epsilon()
     history["writer"].add_scalar("Train/epsilon", eps, t)
 
-    # Increment timestep for tracking
+    # Increment timestep for future tracking
     history["t"] += 1
 
     return (step_type, reward, discount, successor), history
