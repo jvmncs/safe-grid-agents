@@ -17,6 +17,12 @@ from ai_safety_gridworlds.environments.side_effects_sokoban import (
     GAME_FG_COLOURS as SOKOBAN_FG_COLOURS,
     GAME_BG_COLOURS as SOKOBAN_BG_COLOURS,
 )
+from ai_safety_gridworlds.environments.tomato_watering_crmdp import (
+    TomatoWateringCRMDPEnvironment,
+    GAME_FG_COLOURS as TOMATO_CRMDP_FG_COLOURS,
+    GAME_BG_COLOURS as TOMATO_CRMDP_BG_COLOURS,
+)
+
 
 from safe_grid_agents.common.agents import (
     RandomAgent,
@@ -44,6 +50,7 @@ env_map = {  # Dict[EnvName, Env]
     "sokoban": SideEffectsSokobanEnvironment,
     "tomato": TomatoWateringEnvironment,
     # 'whisky':WhiskyOrGoldEnvironment,
+    "tomato-crmdp": TomatoWateringCRMDPEnvironment,
 }
 
 # Mapping of envs to fg and bg colors used in vizualization
@@ -58,6 +65,7 @@ env_color_map = {
     "sokoban": (SOKOBAN_FG_COLOURS, SOKOBAN_BG_COLOURS),
     "tomato": (TOMATO_FG_COLOURS, TOMATO_BG_COLOURS),
     # 'whisky':WhiskyOrGoldEnvironment,
+    "tomato-crmdp": (TOMATO_CRMDP_FG_COLOURS, TOMATO_CRMDP_BG_COLOURS),
 }
 
 agent_map = {  # Dict[AgentName, Agent]
