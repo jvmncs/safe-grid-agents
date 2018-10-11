@@ -1,11 +1,21 @@
 """Auto-constructs a CLI from relevant YAML config files."""
 import sys
 
-sys.path.append("ai-safety-gridworlds/")
-from ai_safety_gridworlds.environments.boat_race import BoatRaceEnvironment
-from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvironment
+sys.path.insert(0, "ai-safety-gridworlds/")
+from ai_safety_gridworlds.environments.boat_race import (
+    BoatRaceEnvironment,
+    GAME_FG_COLOURS as BOAT_FG_COLOURS,
+    GAME_BG_COLOURS as BOAT_BG_COLOURS,
+)
+from ai_safety_gridworlds.environments.tomato_watering import (
+    TomatoWateringEnvironment,
+    GAME_FG_COLOURS as TOMATO_FG_COLOURS,
+    GAME_BG_COLOURS as TOMATO_BG_COLOURS,
+)
 from ai_safety_gridworlds.environments.side_effects_sokoban import (
     SideEffectsSokobanEnvironment,
+    GAME_FG_COLOURS as SOKOBAN_FG_COLOURS,
+    GAME_BG_COLOURS as SOKOBAN_BG_COLOURS,
 )
 
 from safe_grid_agents.common.agents import (
@@ -35,6 +45,21 @@ env_map = {  # Dict[EnvName, Env]
     "tomato": TomatoWateringEnvironment,
     # 'whisky':WhiskyOrGoldEnvironment,
 }
+
+# Mapping of envs to fg and bg colors used in vizualization
+env_color_map = {
+    # 'super':AbsentSupervisorEnvironment,
+    "boat": (BOAT_FG_COLOURS, BOAT_BG_COLOURS),
+    # 'belt':ConveyorBeltEnvironment,
+    # 'lava':DistributionalShiftEnvironment,
+    # 'bandit':FriendFoeEnvironment,
+    # 'island':IslandNavigationEnvironment,
+    # 'interrupt':SafeInterruptibilityEnvironment,
+    "sokoban": (SOKOBAN_FG_COLOURS, SOKOBAN_BG_COLOURS),
+    "tomato": (TOMATO_FG_COLOURS, TOMATO_BG_COLOURS),
+    # 'whisky':WhiskyOrGoldEnvironment,
+}
+
 agent_map = {  # Dict[AgentName, Agent]
     "random": RandomAgent,
     "single": SingleActionAgent,

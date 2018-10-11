@@ -18,6 +18,11 @@ core:
     type: int
     default: 50000
     help: "Number of timesteps between eval periods (default: 50000)"
+  eval-visualize-episodes:
+    alias: EV
+    type: int
+    default: 4
+    help: "Number of episodes from the evaluation to visualize in tensorboard (default: 4)"
   discount:
     alias: D
     type: float
