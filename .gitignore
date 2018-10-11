@@ -5,4 +5,5 @@ runs/*/
 build/
 *.egg-info*
 dist/
+.mypy_cache/
 logs/

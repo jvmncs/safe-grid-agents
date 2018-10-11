@@ -31,7 +31,7 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.Q = defaultdict(lambda: np.zeros(self.action_n))
 
     def act(self, state):
-        state_board = tuple(state["board"].flatten())
+        state_board = tuple(state.flatten())
         return np.argmax(self.Q[state_board])
 
     def act_explore(self, state):
@@ -43,8 +43,8 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
 
     def learn(self, state, action, reward, successor):
         """Q learning."""
-        state_board = tuple(state["board"].flatten())
-        successor_board = tuple(successor["board"].flatten())
+        state_board = tuple(state.flatten())
+        successor_board = tuple(successor.flatten())
         action_next = self.act(successor)
         value_estimate_next = self.Q[successor_board][action_next]
         target = reward + self.discount * value_estimate_next

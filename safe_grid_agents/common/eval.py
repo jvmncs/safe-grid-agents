@@ -14,6 +14,7 @@ def default_eval(agent, env, eval_history, args):
     t = 0
     (step_type, reward, discount, state), done = env.reset(), False
     board = state["board"]
+
     show = args.eval_visualize_episodes > 0
     color_fg, color_bg = env_color_map[args.env_alias]
     next_animation = []

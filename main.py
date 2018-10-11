@@ -37,6 +37,8 @@ if __name__ == "__main__":
     writer = SummaryWriter(args.log_dir)
     history["writer"] = writer
     eval_history["writer"] = writer
+    if args.cheat:
+        history["last_score"] = 0
 
     # Instantiate, warmup
     env = env_class()
@@ -44,24 +46,16 @@ if __name__ == "__main__":
     agent, env, history, args = warmup_fn(agent, env, history, args)
 
     # Learn and occasionally eval
-    eval_next = False
-    done = True
-    episode = 0
-    eval_history["period"] = 0
-    for t in range(args.timesteps):
-        history["t"] = t
-        if done:
-            history = ut.track_metrics(episode, history, env)
-            env_state, done = env.reset(), False
-            episode += 1
-            if eval_next:
-                eval_history = eval_fn(agent, env, eval_history, args)
-                eval_next = False
-            time0 = time.time()
-        env_state, history = learn_fn(agent, env, env_state, history, args)
+    history["t"], eval_history["period"] = 0, 0
+    env_state = env.reset()
+    for episode in range(args.episodes):
+        env_state, history, eval_next = learn_fn(agent, env, env_state, history, args)
+        history = ut.track_metrics(episode, history, env)
 
-        done = env_state[0].value == 2
-        if t % args.eval_every == args.eval_every - 1:
-            eval_next = True
+        env_state, done = env.reset(), False
+        if eval_next:
+            eval_history = eval_fn(agent, env, eval_history, args)
+            eval_next = False
 
+    # One last eval
     eval_history = eval_fn(agent, env, eval_history, args)
