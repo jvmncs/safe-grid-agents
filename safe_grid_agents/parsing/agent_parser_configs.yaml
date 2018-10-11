@@ -57,36 +57,42 @@ deep-q:
     type: int
     default: 0
     help: "If using CUDA, which device to use for DQN in PyTorch (default: 0)"
-  log-gradients:
+  log-gradients: &gradlog
     alias: lg
     action: store_true
     help: "Log gradients to a Tensorboard histogram (default: False)"
-ppo-ac:
+ppo:
   lr: *learnrate
-  horizon:
-    alias: hz
-    type: int
-    required: true
-    help: "Rollout horizon (required)"
-  epochs:
-    alias: e
-    type: int
-    required: true
-    help: "Training epochs per rollout (required)"
+  # horizon:
+  #   alias: hz
+  #   type: int
+  #   required: true
+  #   help: "Rollout horizon (required)"
+  # epochs:
+  #   alias: e
+  #   type: int
+  #   required: true
+  #   help: "Training epochs per rollout (required)"
   batch-size: *batchsize
-  gae-coeff:
-    alias: g
+  clipping:
+    alias: c
     type: float
-    default: .95
-    help: "Generalized advantage estimation coefficient (default: .95)"
-  entropy-bonus:
-    alias: eb
-    type: float
-    default: 0
-    help: "Entropy bonus exploration coefficient (default: 0)"
+    default: .2
+    help: "Epsilon constant for clipping in surrogate loss (default: .2)"
+  # gae-coeff:
+  #   alias: g
+  #   type: float
+  #   default: .95
+  #   help: "Generalized advantage estimation coefficient (default: .95)"
+  # entropy-bonus:
+  #   alias: eb
+  #   type: float
+  #   default: 0
+  #   help: "Entropy bonus exploration coefficient (default: 0)"
   n-layers: *layers
   n-hidden: *hidden
   device: *device
+  log-gradients: *gradlog
 
 # (purportedly) safe RL agents
 tabular-ssq:

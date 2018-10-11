@@ -29,6 +29,7 @@ from safe_grid_agents.common.agents import (
     SingleActionAgent,
     TabularQAgent,
     DeepQAgent,
+    PPOAgent,
 )
 from safe_grid_agents.ssrl import TabularSSQAgent
 from . import core_config, env_config, agent_config
@@ -73,6 +74,7 @@ agent_map = {  # Dict[AgentName, Agent]
     "single": SingleActionAgent,
     "tabular-q": TabularQAgent,
     "deep-q": DeepQAgent,
+    "ppo": PPOAgent,
     "tabular-ssq": TabularSSQAgent,
 }
 

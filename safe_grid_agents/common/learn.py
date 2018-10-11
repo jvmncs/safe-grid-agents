@@ -56,8 +56,10 @@ def dqn_learn(agent, env, env_state, history, args):
 
     # Increment timestep for future tracking
     history["t"] += 1
+    if t % args.eval_every == args.eval_every - 1:
+        eval_next = True
 
-    return (step_type, reward, discount, successor), history
+    return (step_type, reward, discount, successor), history, eval_next
 
 
 @whiler
@@ -91,13 +93,29 @@ def tabq_learn(agent, env, env_state, history, args):
 
     # Increment timestep for future tracking
     history["t"] += 1
+    if t % args.eval_every == args.eval_every - 1:
+        eval_next = True
 
-    return (step_type, reward, discount, successor), history
+    return (step_type, reward, discount, successor), history, eval_next
 
 
 def ppo_learn(agent, env, env_state, history, args):
+    """Learning loop for PPOAgent."""
+    eval_next = False
+    # Act
+    rollout = agent.gather_rollout(env, env_state, history, args)
 
-    raise NotImplementedError
+    # Learn
+    history = agent.learn(*rollout, history, args)
+
+    # Sync old and current policy
+    agent.sync()
+
+    # Check for evaluating next
+    if history["t"] % args.eval_every == args.eval_every - 1:
+        eval_next = True
+
+    return env.reset(), history, eval_next
 
 
 learn_map = {"deep-q": dqn_learn, "tabular-q": tabq_learn, "ppo": ppo_learn}
