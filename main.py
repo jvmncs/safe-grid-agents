@@ -52,10 +52,11 @@ if __name__ == "__main__":
         env_state, history, eval_next = learn_fn(agent, env, env_state, history, args)
         history = ut.track_metrics(episode, history, env)
 
-        env_state, done = env.reset(), False
         if eval_next:
             eval_history = eval_fn(agent, env, eval_history, args)
             eval_next = False
+
+        env_state = env.reset()
 
     # One last eval
     eval_history = eval_fn(agent, env, eval_history, args)

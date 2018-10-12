@@ -123,7 +123,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         next_Qs[terminals] = 0
         expected_Qs = self.discount * next_Qs + rewards
         loss = F.mse_loss(Qs, expected_Qs)
-        history["writer"].add_scalar("Train/loss", loss.item(), history["t"])
+        history["writer"].add_scalar("Train/value_loss", loss.item(), history["t"])
 
         self.optim.zero_grad()
         loss.backward()

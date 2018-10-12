@@ -115,7 +115,7 @@ def ppo_learn(agent, env, env_state, history, args):
     if history["t"] % args.eval_every == args.eval_every - 1:
         eval_next = True
 
-    return env.reset(), history, eval_next
+    return env_state, history, eval_next
 
 
 learn_map = {"deep-q": dqn_learn, "tabular-q": tabq_learn, "ppo": ppo_learn}

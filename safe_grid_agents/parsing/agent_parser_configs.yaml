@@ -63,16 +63,21 @@ deep-q:
     help: "Log gradients to a Tensorboard histogram (default: False)"
 ppo:
   lr: *learnrate
+  rollouts:
+    alias: r
+    type: int
+    required: true
+    help: "Number of rollouts for generating training data (required)"
   # horizon:
   #   alias: hz
   #   type: int
   #   required: true
   #   help: "Rollout horizon (required)"
-  # epochs:
-  #   alias: e
-  #   type: int
-  #   required: true
-  #   help: "Training epochs per rollout (required)"
+  epochs:
+    alias: e
+    type: int
+    required: true
+    help: "Training epochs (required)"
   batch-size: *batchsize
   clipping:
     alias: c

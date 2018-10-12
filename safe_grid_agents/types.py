@@ -14,7 +14,7 @@ Agent = object
 EnvName = str
 Env = object
 
-Rollout = collections.namedtuple("Rollout", ["states", "actions", "rewards"])
+Rollout = collections.namedtuple("Rollout", ["states", "actions", "rewards", "returns"])
 Experience = NamedTuple(
     "Experience",
     [
