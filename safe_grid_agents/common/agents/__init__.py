@@ -1,12 +1,15 @@
 """Top-level agents import."""
 from .dummy import RandomAgent, SingleActionAgent
 from .value import TabularQAgent, DeepQAgent
-from .policy import PPOAgent
+from .policy_mlp import PPOMLPAgent
+from .policy_cnn import PPOCNNAgent
+
 
 __all__ = [
     "RandomAgent",
     "SingleActionAgent",
     "TabularQAgent",
     "DeepQAgent",
-    "PPOAgent",
+    "PPOMLPAgent",
+    "PPOCNNAgent",
 ]

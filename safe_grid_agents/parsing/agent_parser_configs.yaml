@@ -61,9 +61,9 @@ deep-q:
     alias: lg
     action: store_true
     help: "Log gradients to a Tensorboard histogram (default: False)"
-ppo:
+ppo-mlp:
   lr: *learnrate
-  rollouts:
+  rollouts: &rollouts
     alias: r
     type: int
     required: true
@@ -73,13 +73,13 @@ ppo:
   #   type: int
   #   required: true
   #   help: "Rollout horizon (required)"
-  epochs:
+  epochs: &epochs
     alias: e
     type: int
     required: true
     help: "Training epochs (required)"
   batch-size: *batchsize
-  clipping:
+  clipping: &clipping
     alias: c
     type: float
     default: .2
@@ -96,6 +96,20 @@ ppo:
   #   help: "Entropy bonus exploration coefficient (default: 0)"
   n-layers: *layers
   n-hidden: *hidden
+  device: *device
+  log-gradients: *gradlog
+ppo-cnn:
+  n-channels:
+    alias: ch
+    type: int
+    default: 5
+    help: "Number of channels for the convolutional layers (default: 5)"
+  lr: *learnrate
+  rollouts: *rollouts
+  epochs: *epochs
+  batch-size: *batchsize
+  clipping: *clipping
+  n-layers: *layers
   device: *device
   log-gradients: *gradlog
 

@@ -112,4 +112,9 @@ def ppo_learn(agent, env, env_state, history, args):
     return env_state, history, eval_next
 
 
-learn_map = {"deep-q": dqn_learn, "tabular-q": tabq_learn, "ppo": ppo_learn}
+learn_map = {
+    "deep-q": dqn_learn,
+    "tabular-q": tabq_learn,
+    "ppo-mlp": ppo_learn,
+    "ppo-cnn": ppo_learn,
+}
