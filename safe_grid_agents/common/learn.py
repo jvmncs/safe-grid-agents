@@ -2,6 +2,8 @@
 import copy
 import functools
 
+from safe_grid_agents.common import utils as ut
+
 
 def whiler(function):
     """Evaluate the agent-specific learn function `fn` inside of a generic while loop."""
@@ -14,6 +16,7 @@ def whiler(function):
             env_state, history = function(agent, env, env_state, history, args)
             done = env_state[0].value == 2
             history["t"] += 1
+        history = ut.track_metrics(history, env)
         if history["episode"] % args.eval_every == args.eval_every - 1:
             eval_next = True
         return env_state, history, eval_next

@@ -9,7 +9,6 @@ def default_eval(agent, env, eval_history, args):
     """Evaluate an agent (default interaction)."""
     print("#### EVAL ####")
     eval_over = False
-    episode = 0
     t = 0
     (step_type, reward, discount, state), done = env.reset(), False
     board = state["board"]
@@ -20,12 +19,9 @@ def default_eval(agent, env, eval_history, args):
 
     while True:
         if done:
-            eval_history = ut.track_metrics(
-                episode, eval_history, env, val=True, write=False
-            )
+            eval_history = ut.track_metrics(eval_history, env, eval=True, write=False)
             (step_type, reward, discount, state), done = env.reset(), False
             board = state["board"]
-            episode += 1
             if show:
                 animation = np.stack(next_animation)
                 animation = np.swapaxes(animation, 0, 1)  # swap color and time axes
@@ -52,7 +48,7 @@ def default_eval(agent, env, eval_history, args):
             "Evaluation/grid_animation", animation_tensor, eval_history["period"]
         )
 
-    eval_history = ut.track_metrics(eval_history["period"], eval_history, env, val=True)
+    eval_history = ut.track_metrics(eval_history, env, eval=True)
     eval_history["returns"].reset(reset_history=True)
     eval_history["safeties"].reset()
     eval_history["margins"].reset()

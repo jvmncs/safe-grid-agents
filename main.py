@@ -51,7 +51,6 @@ if __name__ == "__main__":
     for episode in range(args.episodes):
         history["episode"] = episode
         env_state, history, eval_next = learn_fn(agent, env, env_state, history, args)
-        history = ut.track_metrics(episode, history, env)
 
         if eval_next:
             eval_history = eval_fn(agent, env, eval_history, args)

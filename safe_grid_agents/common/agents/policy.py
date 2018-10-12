@@ -1,5 +1,6 @@
 """Policy gradient and actor-critic agents."""
 from . import base
+from .. import utils as ut
 from ...types import History, Rollout
 
 from typing import Tuple
@@ -157,6 +158,7 @@ class PPOAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
                 history["t"] += 1
 
             returns = self.get_discounted_returns(rewards)
+            history = ut.track_metrics(history, env)
             rollout.states.append(boards)
             rollout.actions.append(actions)
             rollout.rewards.append(rewards)
