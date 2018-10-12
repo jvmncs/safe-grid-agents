@@ -84,9 +84,9 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
 
             # Calculate loss
             vf_loss = nn.functional.mse_loss(state_values, r.squeeze())
-            pi_loss = torch.min(
-                -(adv * ratio).mean(),
-                -(adv * ratio.clamp(1 - self.clipping, 1 + self.clipping)).mean(),
+            pi_loss = -torch.min(
+                (adv * ratio).mean(),
+                (adv * ratio.clamp(1 - self.clipping, 1 + self.clipping)).mean(),
             )
             loss = (
                 pi_loss
