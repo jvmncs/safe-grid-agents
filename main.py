@@ -49,6 +49,7 @@ if __name__ == "__main__":
     history["t"], eval_history["period"] = 0, 0
     env_state = env.reset()
     for episode in range(args.episodes):
+        history["episode"] = episode
         env_state, history, eval_next = learn_fn(agent, env, env_state, history, args)
         history = ut.track_metrics(episode, history, env)
 

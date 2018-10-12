@@ -16,8 +16,8 @@ core:
   eval-every:
     alias: EE
     type: int
-    default: 50000
-    help: "Approximate number of timesteps between eval periods (default: 50000)"
+    default: 500
+    help: "Number of episodes between eval periods (default: 500)"
   eval-visualize-episodes:
     alias: EV
     type: int

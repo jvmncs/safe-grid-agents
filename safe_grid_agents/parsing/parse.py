@@ -2,25 +2,13 @@
 import sys
 
 sys.path.insert(0, "ai-safety-gridworlds/")
-from ai_safety_gridworlds.environments.boat_race import (
-    BoatRaceEnvironment,
-    GAME_FG_COLOURS as BOAT_FG_COLOURS,
-    GAME_BG_COLOURS as BOAT_BG_COLOURS,
-)
-from ai_safety_gridworlds.environments.tomato_watering import (
-    TomatoWateringEnvironment,
-    GAME_FG_COLOURS as TOMATO_FG_COLOURS,
-    GAME_BG_COLOURS as TOMATO_BG_COLOURS,
-)
+from ai_safety_gridworlds.environments.boat_race import BoatRaceEnvironment
+from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvironment
 from ai_safety_gridworlds.environments.side_effects_sokoban import (
     SideEffectsSokobanEnvironment,
-    GAME_FG_COLOURS as SOKOBAN_FG_COLOURS,
-    GAME_BG_COLOURS as SOKOBAN_BG_COLOURS,
 )
 from ai_safety_gridworlds.environments.tomato_watering_crmdp import (
     TomatoWateringCRMDPEnvironment,
-    GAME_FG_COLOURS as TOMATO_CRMDP_FG_COLOURS,
-    GAME_BG_COLOURS as TOMATO_CRMDP_BG_COLOURS,
 )
 
 
@@ -52,21 +40,6 @@ env_map = {  # Dict[EnvName, Env]
     "tomato": TomatoWateringEnvironment,
     # 'whisky':WhiskyOrGoldEnvironment,
     "tomato-crmdp": TomatoWateringCRMDPEnvironment,
-}
-
-# Mapping of envs to fg and bg colors used in vizualization
-env_color_map = {
-    # 'super':AbsentSupervisorEnvironment,
-    "boat": (BOAT_FG_COLOURS, BOAT_BG_COLOURS),
-    # 'belt':ConveyorBeltEnvironment,
-    # 'lava':DistributionalShiftEnvironment,
-    # 'bandit':FriendFoeEnvironment,
-    # 'island':IslandNavigationEnvironment,
-    # 'interrupt':SafeInterruptibilityEnvironment,
-    "sokoban": (SOKOBAN_FG_COLOURS, SOKOBAN_BG_COLOURS),
-    "tomato": (TOMATO_FG_COLOURS, TOMATO_BG_COLOURS),
-    # 'whisky':WhiskyOrGoldEnvironment,
-    "tomato-crmdp": (TOMATO_CRMDP_FG_COLOURS, TOMATO_CRMDP_BG_COLOURS),
 }
 
 agent_map = {  # Dict[AgentName, Agent]

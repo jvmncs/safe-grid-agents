@@ -13,8 +13,9 @@ def whiler(function):
         while not done:
             env_state, history = function(agent, env, env_state, history, args)
             done = env_state[0].value == 2
-            if history["t"] % args.eval_every == args.eval_every - 1:
-                eval_next = True
+            history["t"] += 1
+        if history["episode"] % args.eval_every == args.eval_every - 1:
+            eval_next = True
         return env_state, history, eval_next
 
     return stepbystep
@@ -54,12 +55,7 @@ def dqn_learn(agent, env, env_state, history, args):
     if t % args.sync_every == args.sync_every - 1:
         agent.sync_target_Q()
 
-    # Increment timestep for future tracking
-    history["t"] += 1
-    if t % args.eval_every == args.eval_every - 1:
-        eval_next = True
-
-    return (step_type, reward, discount, successor), history, eval_next
+    return (step_type, reward, discount, successor), history
 
 
 @whiler
@@ -91,12 +87,7 @@ def tabq_learn(agent, env, env_state, history, args):
     eps = agent.update_epsilon()
     history["writer"].add_scalar("Train/epsilon", eps, t)
 
-    # Increment timestep for future tracking
-    history["t"] += 1
-    if t % args.eval_every == args.eval_every - 1:
-        eval_next = True
-
-    return (step_type, reward, discount, successor), history, eval_next
+    return (step_type, reward, discount, successor), history
 
 
 def ppo_learn(agent, env, env_state, history, args):
@@ -112,7 +103,7 @@ def ppo_learn(agent, env, env_state, history, args):
     agent.sync()
 
     # Check for evaluating next
-    if history["t"] % args.eval_every == args.eval_every - 1:
+    if history["episode"] % args.eval_every == args.eval_every - 1:
         eval_next = True
 
     return env_state, history, eval_next

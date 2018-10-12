@@ -3,7 +3,6 @@ import numpy as np
 
 from . import utils as ut
 from collections import defaultdict
-from safe_grid_agents.parsing import env_color_map
 
 
 def default_eval(agent, env, eval_history, args):
@@ -16,8 +15,7 @@ def default_eval(agent, env, eval_history, args):
     board = state["board"]
 
     show = args.eval_visualize_episodes > 0
-    color_fg, color_bg = env_color_map[args.env_alias]
-    next_animation = []
+    next_animation = [np.copy(state["RGB"])]
     episodes_to_show = []
 
     while True:
@@ -32,23 +30,27 @@ def default_eval(agent, env, eval_history, args):
                 animation = np.stack(next_animation)
                 animation = np.swapaxes(animation, 0, 1)  # swap color and time axes
                 episodes_to_show.append(animation)
-                next_animation = []
+                next_animation = [np.copy(state["RGB"])]
                 show = args.eval_visualize_episodes > len(episodes_to_show)
             if eval_over:
                 break
+
         action = agent.act(board)
         step_type, reward, discount, successor = env.step(action)
+        board = successor["board"]
 
         done = step_type.value == 2
         t += 1
         eval_over = t >= args.eval_timesteps
 
         if show:
-            next_animation.append(ut.make_board_rgb(env, color_bg))
+            next_animation.append(np.copy(successor["RGB"]))
 
     if len(episodes_to_show) > 0:
         animation_tensor = np.stack(episodes_to_show)
-        eval_history["writer"].add_video("Evaluation/grid_animation", animation_tensor)
+        eval_history["writer"].add_video(
+            "Evaluation/grid_animation", animation_tensor, eval_history["period"]
+        )
 
     eval_history = ut.track_metrics(eval_history["period"], eval_history, env, val=True)
     eval_history["returns"].reset(reset_history=True)
