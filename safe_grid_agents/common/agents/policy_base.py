@@ -101,6 +101,9 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
             history["writer"].add_scalar(
                 "Train/value_loss", vf_loss.item(), history["t"]
             )
+            history["writer"].add_scalar(
+                "Train/policy_entropy", self.entropy_bonus * entropy, history["t"]
+            )
 
             # Backprop and step with optional gradient logging
             self.optim.zero_grad()
