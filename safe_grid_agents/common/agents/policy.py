@@ -31,8 +31,9 @@ class PPOAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.rollouts = args.rollouts
         self.epochs = args.epochs
         self.clipping = args.clipping
+        self.critic_coeff = args.critic_coeff
         # self.gae = args.gae_coeff
-        # self.entropy = args.entropy_bonus
+        self.entropy_bonus = args.entropy_bonus
 
         # Network logistics
         self.build_ac()
@@ -92,13 +93,16 @@ class PPOAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
             log_probs_curr = policy_curr.log_prob(a)
             ratio = torch.exp(log_probs_curr - log_probs_old)
 
+            # Get entropy of current policy
+            entropy = policy_curr.entropy().mean()
+
             # Calculate loss
             vf_loss = nn.functional.mse_loss(state_values, r.squeeze())
             pi_loss = torch.min(
                 -(adv * ratio).mean(),
                 -(adv * ratio.clamp(1 - self.clipping, 1 + self.clipping)).mean(),
             )
-            loss = pi_loss + vf_loss
+            loss = pi_loss + self.critic_coeff * vf_loss - self.entropy_bonus * entropy
 
             # Logging
             history["writer"].add_scalar(
@@ -106,6 +110,9 @@ class PPOAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
             )
             history["writer"].add_scalar(
                 "Train/value_loss", vf_loss.item(), history["t"]
+            )
+            history["writer"].add_scalar(
+                "Train/policy_entropy", self.entropy_bonus * entropy, history["t"]
             )
 
             # Backprop and step with optional gradient logging

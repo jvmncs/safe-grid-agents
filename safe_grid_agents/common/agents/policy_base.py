@@ -32,8 +32,9 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
         self.rollouts = args.rollouts
         self.epochs = args.epochs
         self.clipping = args.clipping
+        self.critic_coeff = args.critic_coeff
         # self.gae = args.gae_coeff
-        # self.entropy = args.entropy_bonus
+        self.entropy_bonus = args.entropy_bonus
 
         # Network logistics
         self.build_ac()
@@ -87,7 +88,11 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
                 -(adv * ratio).mean(),
                 -(adv * ratio.clamp(1 - self.clipping, 1 + self.clipping)).mean(),
             )
-            loss = pi_loss + vf_loss
+            loss = (
+                pi_loss
+                + self.critic_coeff * vf_loss
+                - self.entropy_bonus * policy_curr.entropy().mean()
+            )
 
             # Logging
             history["writer"].add_scalar(

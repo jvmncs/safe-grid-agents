@@ -84,16 +84,21 @@ ppo-mlp:
     type: float
     default: .2
     help: "Epsilon constant for clipping in surrogate loss (default: .2)"
+  critic-coeff: &critic_coeff
+    alias: cc
+    type: float
+    default: 1.
+    help: "Scaling coefficient of critic loss; should be in (0,1] (default: 1)"
   # gae-coeff:
   #   alias: g
   #   type: float
   #   default: .95
   #   help: "Generalized advantage estimation coefficient (default: .95)"
-  # entropy-bonus:
-  #   alias: eb
-  #   type: float
-  #   default: 0
-  #   help: "Entropy bonus exploration coefficient (default: 0)"
+  entropy-bonus: &entropy_bonus
+    alias: eb
+    type: float
+    default: .01
+    help: "Entropy bonus exploration coefficient (default: .01)"
   n-layers: *layers
   n-hidden: *hidden
   device: *device
@@ -109,6 +114,8 @@ ppo-cnn:
   epochs: *epochs
   batch-size: *batchsize
   clipping: *clipping
+  critic-coeff: *critic_coeff
+  entropy-bonus: *entropy_bonus
   n-layers: *layers
   device: *device
   log-gradients: *gradlog
