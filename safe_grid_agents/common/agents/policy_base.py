@@ -82,17 +82,16 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
             log_probs_curr = policy_curr.log_prob(a)
             ratio = torch.exp(log_probs_curr - log_probs_old)
 
+            # Get current policy's entropy
+            entropy = policy_curr.entropy().mean()
+
             # Calculate loss
             vf_loss = nn.functional.mse_loss(state_values, r.squeeze())
             pi_loss = torch.min(
                 -(adv * ratio).mean(),
                 -(adv * ratio.clamp(1 - self.clipping, 1 + self.clipping)).mean(),
             )
-            loss = (
-                pi_loss
-                + self.critic_coeff * vf_loss
-                - self.entropy_bonus * policy_curr.entropy().mean()
-            )
+            loss = pi_loss + self.critic_coeff * vf_loss - self.entropy_bonus * entropy
 
             # Logging
             history["writer"].add_scalar(
