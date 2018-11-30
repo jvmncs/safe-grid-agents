@@ -20,8 +20,8 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
         super().__init__()
         self.action_n = int(env.action_spec().maximum + 1)
         self.discount = args.discount
-        board_shape = env.observation_spec()["board"].shape
-        self.n_input = board_shape[0] * board_shape[1]
+        self.board_shape = env.observation_spec()["board"].shape
+        self.n_input = self.board_shape[0] * self.board_shape[1]
         self.device = args.device
         self.log_gradients = args.log_gradients
 
@@ -32,9 +32,8 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
         self.rollouts = args.rollouts
         self.epochs = args.epochs
         self.clipping = args.clipping
-        self.critic_coeff = args.critic_coeff
         # self.gae = args.gae_coeff
-        self.entropy_bonus = args.entropy_bonus
+        # self.entropy = args.entropy_bonus
 
         # Network logistics
         self.build_ac()

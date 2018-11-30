@@ -117,4 +117,5 @@ learn_map = {
     "tabular-q": tabq_learn,
     "ppo-mlp": ppo_learn,
     "ppo-cnn": ppo_learn,
+    "ppo-crmdp": ppo_learn,
 }
