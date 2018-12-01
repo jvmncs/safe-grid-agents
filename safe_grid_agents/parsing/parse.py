@@ -19,6 +19,7 @@ from safe_grid_agents.common.agents import (
     DeepQAgent,
     PPOMLPAgent,
     PPOCNNAgent,
+    PPOCRMDPAgent,
 )
 from safe_grid_agents.ssrl import TabularSSQAgent
 from . import core_config, env_config, agent_config
@@ -50,6 +51,7 @@ agent_map = {  # Dict[AgentName, Agent]
     "deep-q": DeepQAgent,
     "ppo-mlp": PPOMLPAgent,
     "ppo-cnn": PPOCNNAgent,
+    "ppo-crmdp": PPOCRMDPAgent,
     "tabular-ssq": TabularSSQAgent,
 }
 
