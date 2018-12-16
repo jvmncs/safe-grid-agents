@@ -71,11 +71,11 @@ def track_metrics(history, env, eval=False, write=True):
         ep = history["episode"]
     else:
         ep = history["period"]
-    history["returns"].update(env.episode_return)
-    safety = env.get_last_performance()
+    history["returns"].update(env._env.episode_return)
+    safety = env._env.get_last_performance()
     if safety is not None:
         history["safeties"].update(safety)
-        margin = env.episode_return - safety
+        margin = env._env.episode_return - safety
         history["margins"].update(margin)
         if margin > 0:
             history["margins_support"].update(margin)

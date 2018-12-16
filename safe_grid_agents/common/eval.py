@@ -10,37 +10,34 @@ def default_eval(agent, env, eval_history, args):
     print("#### EVAL ####")
     eval_over = False
     t = 0
-    (step_type, reward, discount, state), done = env.reset(), False
+    state, done = env.reset(), False
     board = state["board"]
 
     show = args.eval_visualize_episodes > 0
-    next_animation = [np.copy(state["RGB"])]
+    next_animation = [np.copy(env._rgb)]
     episodes_to_show = []
 
     while True:
         if done:
             eval_history = ut.track_metrics(eval_history, env, eval=True, write=False)
-            (step_type, reward, discount, state), done = env.reset(), False
-            board = state["board"]
+            state, done = env.reset(), False
             if show:
                 animation = np.stack(next_animation)
                 animation = np.swapaxes(animation, 0, 1)  # swap color and time axes
                 episodes_to_show.append(animation)
-                next_animation = [np.copy(state["RGB"])]
+                next_animation = [np.copy(env._rgb)]
                 show = args.eval_visualize_episodes > len(episodes_to_show)
             if eval_over:
                 break
 
-        action = agent.act(board)
-        step_type, reward, discount, successor = env.step(action)
-        board = successor["board"]
+        action = agent.act(state)
+        state, reward, done, info = env.step(action)
 
-        done = step_type.value == 2
         t += 1
         eval_over = t >= args.eval_timesteps
 
         if show:
-            next_animation.append(np.copy(successor["RGB"]))
+            next_animation.append(np.copy(env._rgb))
 
     if len(episodes_to_show) > 0:
         animation_tensor = np.stack(episodes_to_show)

@@ -7,7 +7,7 @@ from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvi
 from ai_safety_gridworlds.environments.side_effects_sokoban import (
     SideEffectsSokobanEnvironment,
 )
-from ai_safety_gridworlds.environments.tomato_watering_crmdp import (
+from ai_safety_gridworlds.environments.tomato_crmdp import (
     TomatoWateringCRMDPEnvironment,
 )
 
@@ -27,21 +27,21 @@ import yaml
 import argparse
 import copy
 from typing import Dict
-from ..types import Env, EnvName, Agent, AgentName
+from ..types import EnvAlias, EnvName, Agent, AgentName
 
 # Mapping of envs/agents to Python classes
-env_map = {  # Dict[EnvName, Env]
-    # 'super':AbsentSupervisorEnvironment,
-    "boat": BoatRaceEnvironment,
-    # 'belt':ConveyorBeltEnvironment,
-    # 'lava':DistributionalShiftEnvironment,
-    # 'bandit':FriendFoeEnvironment,
-    # 'island':IslandNavigationEnvironment,
-    # 'interrupt':SafeInterruptibilityEnvironment,
-    "sokoban": SideEffectsSokobanEnvironment,
-    "tomato": TomatoWateringEnvironment,
-    # 'whisky':WhiskyOrGoldEnvironment,
-    "tomato-crmdp": TomatoWateringCRMDPEnvironment,
+env_map = {  # Dict[EnvAlias, EnvName]
+    "bandit": "friend_foe",
+    "belt": "conveyor_belt",
+    "boat": "boat_race",
+    "interrupt": "safe_interruptibility",
+    "island": "island_navigation",
+    "lava": "distributional_shift",
+    "sokoban": "side_effects_sokoban",
+    "super": "absent_supervisor",
+    "tomato": "tomato_watering",
+    "tomato-crmdp": "tomato_crmdp",
+    "whisky": "whisky_gold",
 }
 
 agent_map = {  # Dict[AgentName, Agent]

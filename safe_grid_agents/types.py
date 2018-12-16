@@ -11,8 +11,8 @@ History = Dict[str, object]
 AgentName = str
 Agent = object
 
+EnvAlias = str
 EnvName = str
-Env = object
 
 Rollout = collections.namedtuple("Rollout", ["states", "actions", "rewards", "returns"])
 Experience = NamedTuple(
