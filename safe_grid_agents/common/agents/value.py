@@ -87,9 +87,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.optim = torch.optim.Adam(self.Q.parameters(), lr=args.lr, amsgrad=True)
 
     def act(self, state):
-        state_board = torch.as_tensor(
-            state.flatten(), dtype=torch.float32, device=self.device
-        ).reshape(1, -1)
+        state_board = self._lift(state.flatten()).reshape(1, -1)
         scores = self.Q(state_board)
         return scores.argmax(1)
 
@@ -161,30 +159,22 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
 
     def process(self, experiences) -> ExperienceBatch:
         """Convert gridworld representations to torch Tensors."""
-        boards = [experience.state.flatten() for experience in experiences]
-        boards = (
-            torch.as_tensor(
-                np.concatenate(boards, axis=0), dtype=torch.float32, device=self.device
-            )
-            .requires_grad_()
-            .reshape(-1, self.n_input)
-        )
+        boards = np.concatenate([experience.state.flatten() for experience in experiences], axis=0)
+        boards = self._lift(boards, grad=True).reshape(-1, self.n_input)
+
         actions = [experience.action for experience in experiences]
-        actions = torch.as_tensor(
-            actions, dtype=torch.long, device=self.device
-        ).reshape(-1, 1)
+        actions = self._lift(actions, dtype=torch.long).reshape(-1, 1)
+
         rewards = [experience.reward for experience in experiences]
-        rewards = torch.as_tensor(rewards, dtype=torch.float32, device=self.device)
-        successors = [experience.successor.flatten() for experience in experiences]
-        successors = (
-            torch.as_tensor(
-                np.concatenate(successors, axis=0),
-                dtype=torch.float32,
-                device=self.device,
-            )
-            .requires_grad_()
-            .reshape(-1, self.n_input)
-        )
+        rewards = self._lift(rewards)
+
+        successors = np.concatenate([experience.successor.flatten() for experience in experiences], axis=0)
+        successors = self._lift(successors, grad=True).reshape(-1, self.n_input)
+
         terminals = [experience.terminal for experience in experiences]
-        terminals = torch.as_tensor(terminals, dtype=torch.uint8, device=self.device)
+        terminals = self._lift(terminals, dtype=torch.uint8)
+
         return boards, actions, rewards, successors, terminals
+
+    def _lift(self, x, dtype=torch.float32, grad=False):
+        return torch.as_tensor(x, dtype=dtype, device=self.device, requires_grad=grad)
