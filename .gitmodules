@@ -1,4 +1,0 @@
-[submodule "ai-safety-gridworlds"]
-	path = ai-safety-gridworlds
-	url = https://github.com/jvmancuso/ai-safety-gridworlds.git
-	branch = master
