@@ -18,7 +18,7 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
 
     def __init__(self, env, args) -> None:
         super().__init__()
-        self.action_n = int(env.action_spec().maximum + 1)
+        self.action_n = int(env.action_space.max_action + 1)
         self.discount = args.discount
         self.board_shape = env.observation_spec()["board"].shape
         self.n_input = self.board_shape[0] * self.board_shape[1]

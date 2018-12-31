@@ -7,9 +7,7 @@ from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvi
 from ai_safety_gridworlds.environments.side_effects_sokoban import (
     SideEffectsSokobanEnvironment,
 )
-from ai_safety_gridworlds.environments.tomato_crmdp import (
-    TomatoWateringCRMDPEnvironment,
-)
+from ai_safety_gridworlds.environments.tomato_crmdp import TomatoCRMDPEnvironment
 
 
 from safe_grid_agents.common.agents import (

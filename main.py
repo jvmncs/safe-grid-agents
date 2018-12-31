@@ -4,6 +4,7 @@ from safe_grid_agents.common.warmup import warmup_map
 from safe_grid_agents.common.learn import learn_map
 from safe_grid_agents.common.eval import eval_map
 from safe_grid_agents.common import utils as ut
+from safe_grid_gym.envs import GridworldEnv
 
 import os
 import time
@@ -39,7 +40,7 @@ if __name__ == "__main__":
     eval_history["writer"] = writer
 
     # Instantiate, warmup
-    env = GridworldsEnv(env_name, pause=0)
+    env = GridworldEnv(env_name)
     agent = agent_class(env, args)
     agent, env, history, args = warmup_fn(agent, env, history, args)
 
@@ -55,7 +56,7 @@ if __name__ == "__main__":
             eval_history = eval_fn(agent, env, eval_history, args)
             eval_next = False
 
-        env_state = env.reset()
+        env_state = env.reset(), 0.0, False, {}
 
     # One last eval
     eval_history = eval_fn(agent, env, eval_history, args)

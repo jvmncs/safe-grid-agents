@@ -19,6 +19,7 @@ def whiler(function):
         history = ut.track_metrics(history, env)
         if history["episode"] % args.eval_every == args.eval_every - 1:
             eval_next = True
+
         return env_state, history, eval_next
 
     return stepbystep
@@ -63,7 +64,7 @@ def tabq_learn(agent, env, env_state, history, args):
     t = history["t"]
 
     # Act
-    action = agent.act_explore(board)
+    action = agent.act_explore(state)
     successor, reward, done, info = env.step(action)
 
     # Learn
@@ -74,7 +75,7 @@ def tabq_learn(agent, env, env_state, history, args):
             action = successor["extra_observations"]["actual_actions"]
         except KeyError:
             pass
-    agent.learn(board, action, reward, succ_board)
+    agent.learn(state, action, reward, successor)
 
     # Modify exploration
     eps = agent.update_epsilon()

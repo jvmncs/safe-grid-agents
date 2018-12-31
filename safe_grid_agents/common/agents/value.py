@@ -16,7 +16,7 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
     """Tabular Q-learner."""
 
     def __init__(self, env, args):
-        self.action_n = int(env.action_spec().maximum + 1)
+        self.action_n = int(env.action_space.max_action + 1)
         self.discount = args.discount
 
         # Agent definition
@@ -62,7 +62,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
     """Q-learner with deep function approximation."""
 
     def __init__(self, env, args):
-        self.action_n = int(env.action_spec().maximum + 1)
+        self.action_n = int(env.action_space.max_action + 1)
         board_shape = env.observation_spec()["board"].shape
         self.n_input = board_shape[0] * board_shape[1]
         self.device = args.device
@@ -159,7 +159,9 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
 
     def process(self, experiences) -> ExperienceBatch:
         """Convert gridworld representations to torch Tensors."""
-        boards = np.concatenate([experience.state.flatten() for experience in experiences], axis=0)
+        boards = np.concatenate(
+            [experience.state.flatten() for experience in experiences], axis=0
+        )
         boards = self._lift(boards, grad=True).reshape(-1, self.n_input)
 
         actions = [experience.action for experience in experiences]
@@ -168,7 +170,9 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         rewards = [experience.reward for experience in experiences]
         rewards = self._lift(rewards)
 
-        successors = np.concatenate([experience.successor.flatten() for experience in experiences], axis=0)
+        successors = np.concatenate(
+            [experience.successor.flatten() for experience in experiences], axis=0
+        )
         successors = self._lift(successors, grad=True).reshape(-1, self.n_input)
 
         terminals = [experience.terminal for experience in experiences]
