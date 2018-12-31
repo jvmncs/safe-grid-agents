@@ -14,11 +14,12 @@ def whiler(function):
         eval_next = False
         while not done:
             env_state, history = function(agent, env, env_state, history, args)
-            done = env_state[0].value == 2
+            done = env_state[2]
             history["t"] += 1
         history = ut.track_metrics(history, env)
         if history["episode"] % args.eval_every == args.eval_every - 1:
             eval_next = True
+
         return env_state, history, eval_next
 
     return stepbystep
@@ -27,28 +28,23 @@ def whiler(function):
 @whiler
 def dqn_learn(agent, env, env_state, history, args):
     """Learning loop for DeepQAgent."""
-    step_type, reward, discount, state = env_state
-    state = copy.deepcopy(state)  # Make sure `state` doesn't change next step
-    board = state["board"]
+    state, reward, done, info = env_state
+
     t = history["t"]
 
     # Act
-    action = agent.act_explore(board)
-    step_type, reward, discount, successor = env.step(action)
-    terminal = env_state[0].value == 2
-    succ_board = successor["board"]
+    action = agent.act_explore(state)
+    successor, reward, done, info = env.step(action)
 
     # Learn
     if args.cheat:
-        current_score = env._get_hidden_reward()
-        reward = current_score - history["last_score"]
-        history["last_score"] = current_score
+        reward = info["hidden_reward"]
         # In case the agent is drunk, use the actual action they took
         try:
-            action = successor["extra_observations"]["actual_actions"]
+            action = info["extra_observations"]["actual_actions"]
         except KeyError:
             pass
-    history = agent.learn(board, action, reward, succ_board, terminal, history)
+    history = agent.learn(state, action, reward, successor, done, history)
 
     # Modify exploration
     eps = agent.update_epsilon()
@@ -58,39 +54,34 @@ def dqn_learn(agent, env, env_state, history, args):
     if t % args.sync_every == args.sync_every - 1:
         agent.sync_target_Q()
 
-    return (step_type, reward, discount, successor), history
+    return (successor, reward, done, info), history
 
 
 @whiler
 def tabq_learn(agent, env, env_state, history, args):
     """Learning loop for TabularQAgent."""
-    step_type, reward, discount, state = env_state
-    state = copy.deepcopy(state)
-    board = state["board"]
+    state, reward, done, info = env_state
     t = history["t"]
 
     # Act
-    action = agent.act_explore(board)
-    step_type, reward, discount, successor = env.step(action)
-    succ_board = successor["board"]
+    action = agent.act_explore(state)
+    successor, reward, done, info = env.step(action)
 
     # Learn
     if args.cheat:
-        current_score = env._get_hidden_reward()
-        reward = current_score - history["last_score"]
-        history["last_score"] = current_score
+        reward = info["hidden_reward"]
         # In case the agent is drunk, use the actual action they took
         try:
             action = successor["extra_observations"]["actual_actions"]
         except KeyError:
             pass
-    agent.learn(board, action, reward, succ_board)
+    agent.learn(state, action, reward, successor)
 
     # Modify exploration
     eps = agent.update_epsilon()
     history["writer"].add_scalar("Train/epsilon", eps, t)
 
-    return (step_type, reward, discount, successor), history
+    return (successor, reward, done, info), history
 
 
 def ppo_learn(agent, env, env_state, history, args):

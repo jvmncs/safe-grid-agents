@@ -18,7 +18,7 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
 
     def __init__(self, env, args) -> None:
         super().__init__()
-        self.action_n = int(env.action_spec().maximum + 1)
+        self.action_n = int(env.action_space.max_action + 1)
         self.discount = args.discount
         self.board_shape = env.observation_spec()["board"].shape
         self.n_input = self.board_shape[0] * self.board_shape[1]
@@ -94,7 +94,7 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
 
             # Logging
             history["writer"].add_scalar(
-                "Train/policy_loss", -pi_loss.item(), history["t"]
+                "Train/policy_loss", pi_loss.item(), history["t"]
             )
             history["writer"].add_scalar(
                 "Train/value_loss", vf_loss.item(), history["t"]
@@ -118,7 +118,7 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
 
     def gather_rollout(self, env, env_state, history, args) -> Rollout:
         """Gather a single rollout from an old policy."""
-        step_type, reward, discount, state = env_state
+        state, reward, done, info = env_state
         done = False
         rollout = Rollout(states=[], actions=[], rewards=[], returns=[])
 
@@ -126,18 +126,13 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
             # Rollout loop
             boards, actions, rewards, returns = [], [], [], []
             while not done:
-                state = deepcopy(state)
-                board = state["board"]
-                action = self.old_policy.act_explore(board)
+                action = self.old_policy.act_explore(state)
                 with torch.no_grad():
-                    step_type, reward, discount, successor = env.step(action)
-                    done = step_type.value == 2
+                    successor, reward, done, info = env.step(action)
 
                 # Maybe cheat
                 if args.cheat:
-                    current_score = env._get_hidden_reward()
-                    reward = current_score - history["last_score"]
-                    history["last_score"] = current_score
+                    reward = info["hidden_reward"]
                     # In case the agent is drunk, use the actual action they took
                     try:
                         action = successor["extra_observations"]["actual_actions"]
