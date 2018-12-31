@@ -6,8 +6,6 @@ Emphasizing extensibility, modularity, and accessibility.
 
 ## Layout
 
--   `ai-safety-gridworlds`: Submodule of DeepMind's official
-    [repo](https://github.com/deepmind/ai-safety-gridworlds).
 -   `safe_grid_agents/common`: Core codebase. Includes abstract base
     classes for a variety of agents, their associated warmup/learn/eval
     functions, and a utilities file.
@@ -16,6 +14,22 @@ Emphasizing extensibility, modularity, and accessibility.
     for `main.py`.
 -   `safe_grid_agents/ssrl`: Agents that implement semi-supervised
     reinforcement learning and their associated warmup functions.
+
+## Installation
+When installing with pip, make sure to use the `process-dependency-links` flag:
+```bash
+pip install . --process-dependency-links
+```
+URL-based dependencies are available for audit at the following repositories and forks:
+- [safe-grid-gym](https://github.com/jvmancuso/safe-grid-gym)
+- [ai-safety-gridworlds](https://github.com/jvmancuso/ai-safety-gridworlds)
+
+If you plan on developing this library, make sure to add an `-e` flag to the above pip install command.
+
+This repo requires TensorboardX for monitoring and visualizing agent learning, as well as PyTorch for implementation of certain agents.  Currently, TensorboardX does not function properly without Tensorflow installed.  Since the installation process of these packages can vary system to system, we exclude them from our build process.  There are multiple tutorials online for installing both of these online.  For example, on OS X without CUDA support I'd go with:
+```bash
+pip install torch torchvision tensorflow
+```
 
 # Usage
 
