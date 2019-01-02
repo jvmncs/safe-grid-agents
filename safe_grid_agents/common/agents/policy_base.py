@@ -1,7 +1,7 @@
 """Policy gradient and actor-critic agents."""
-from . import base
-from .. import utils as ut
-from ...types import History, Rollout
+from safe_grid_agents.common.agents.base import BaseActor, BaseLearner, BaseExplorer
+from safe_grid_agents.common.utils import track_metrics
+from safe_grid_agents.types import History, Rollout
 
 import abc
 from typing import Tuple
@@ -11,7 +11,7 @@ import torch.nn as nn
 from torch.distributions import Categorical
 
 
-class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
+class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
     """Actor-critic variant of PPO."""
 
     __metaclass__ = abc.ABCMeta

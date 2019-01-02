@@ -1,7 +1,6 @@
 """Auto-constructs a CLI from relevant YAML config files."""
 import sys
 
-sys.path.insert(0, "ai-safety-gridworlds/")
 from ai_safety_gridworlds.environments.boat_race import BoatRaceEnvironment
 from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvironment
 from ai_safety_gridworlds.environments.side_effects_sokoban import (
@@ -20,12 +19,12 @@ from safe_grid_agents.common.agents import (
     PPOCRMDPAgent,
 )
 from safe_grid_agents.ssrl import TabularSSQAgent
-from . import core_config, env_config, agent_config
+from safe_grid_agents.parsing import core_config, env_config, agent_config
 import yaml
 import argparse
 import copy
 from typing import Dict
-from ..types import EnvAlias, EnvName, Agent, AgentName
+from safe_grid_agents.types import EnvAlias, EnvName, Agent, AgentName
 
 # Mapping of envs/agents to Python classes
 env_map = {  # Dict[EnvAlias, EnvName]

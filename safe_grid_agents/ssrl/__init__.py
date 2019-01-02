@@ -1,1 +1,1 @@
-from .agents import TabularSSQAgent
+from safe_grid_agents.ssrl.agents import TabularSSQAgent

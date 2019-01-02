@@ -1,10 +1,10 @@
 """Dummy agents for development."""
-from . import base
+from safe_grid_agents.common.agents.base import BaseActor
 
 import numpy as np
 
 
-class RandomAgent(base.BaseActor):
+class RandomAgent(BaseActor):
     """Random walker."""
 
     def __init__(self, env, args):
@@ -16,7 +16,7 @@ class RandomAgent(base.BaseActor):
         return np.random.randint(0, self.action_n)
 
 
-class SingleActionAgent(base.BaseActor):
+class SingleActionAgent(BaseActor):
     """Always chooses a single boring action (for testing)."""
 
     def __init__(self, env, args):

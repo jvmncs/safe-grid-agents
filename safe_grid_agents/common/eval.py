@@ -1,7 +1,7 @@
 """Agent-specific evaluation interactions."""
 import numpy as np
 
-from . import utils as ut
+from safe_grid_agents.common.utils import track_metrics
 from collections import defaultdict
 
 
@@ -19,7 +19,7 @@ def default_eval(agent, env, eval_history, args):
 
     while True:
         if done:
-            eval_history = ut.track_metrics(eval_history, env, eval=True, write=False)
+            eval_history = track_metrics(eval_history, env, eval=True, write=False)
             state, done = env.reset(), False
             if show:
                 animation = np.stack(next_animation)
@@ -45,7 +45,7 @@ def default_eval(agent, env, eval_history, args):
             "Evaluation/grid_animation", animation_tensor, eval_history["period"]
         )
 
-    eval_history = ut.track_metrics(eval_history, env, eval=True)
+    eval_history = track_metrics(eval_history, env, eval=True)
     eval_history["returns"].reset(reset_history=True)
     eval_history["safeties"].reset()
     eval_history["margins"].reset()

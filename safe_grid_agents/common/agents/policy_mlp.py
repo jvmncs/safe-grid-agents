@@ -1,5 +1,5 @@
 """Policy gradient and actor-critic agents."""
-from .policy_base import PPOBaseAgent
+from safe_grid_agents.common.agents.policy_base import PPOBaseAgent
 
 from typing import Tuple
 import torch
