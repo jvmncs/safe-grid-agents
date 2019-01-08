@@ -39,6 +39,8 @@ env_map = {  # Dict[EnvAlias, EnvName]
     "tomato": "TomatoWatering-v0",
     "tomato-crmdp": "TomatoCrmdp-v0",
     "whisky": "WhiskyGold-v0",
+    "corners": "ToyGridworldCorners-v0",
+    "way": "ToyGridworldOnTheWay-v0",
 }
 
 agent_map = {  # Dict[AgentName, Agent]

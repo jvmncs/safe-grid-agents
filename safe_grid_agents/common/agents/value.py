@@ -16,7 +16,7 @@ class TabularQAgent(BaseActor, BaseLearner, BaseExplorer):
     """Tabular Q-learner."""
 
     def __init__(self, env, args):
-        self.action_n = int(env.action_space.max_action + 1)
+        self.action_n = env.action_space.n
         self.discount = args.discount
 
         # Agent definition
