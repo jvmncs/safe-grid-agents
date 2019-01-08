@@ -4,8 +4,10 @@ from safe_grid_agents.common.warmup import warmup_map
 from safe_grid_agents.common.learn import learn_map
 from safe_grid_agents.common.eval import eval_map
 from safe_grid_agents.common import utils as ut
-from safe_grid_gym.envs import GridworldEnv
 
+import safe_grid_gym
+
+import gym
 import os
 import time
 from tensorboardX import SummaryWriter
@@ -40,7 +42,7 @@ if __name__ == "__main__":
     eval_history["writer"] = writer
 
     # Instantiate, warmup
-    env = GridworldEnv(env_name)
+    env = gym.make(env_name)
     agent = agent_class(env, args)
     agent, env, history, args = warmup_fn(agent, env, history, args)
 
