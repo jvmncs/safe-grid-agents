@@ -6,7 +6,6 @@ from safe_grid_agents.common.eval import eval_map
 from safe_grid_agents.common import utils as ut
 
 import safe_grid_gym
-import safety_gridworlds_gym
 
 import gym
 import os
