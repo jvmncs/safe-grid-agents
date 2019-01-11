@@ -1,7 +1,7 @@
 """Value-based agents."""
-from . import base
-from .. import utils
-from ...types import History, ExperienceBatch
+from safe_grid_agents.common.agents.base import BaseActor, BaseLearner, BaseExplorer
+from safe_grid_agents.common.utils import ReplayBuffer
+from safe_grid_agents.types import History, ExperienceBatch
 
 from collections import defaultdict
 import numpy as np
@@ -12,7 +12,7 @@ from torch.distributions import Categorical
 
 
 # Baseline agents
-class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
+class TabularQAgent(BaseActor, BaseLearner, BaseExplorer):
     """Tabular Q-learner."""
 
     def __init__(self, env, args):
@@ -58,7 +58,7 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         return self.epsilon
 
 
-class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
+class DeepQAgent(BaseActor, BaseLearner, BaseExplorer):
     """Q-learner with deep function approximation."""
 
     def __init__(self, env, args):
@@ -83,7 +83,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.target_Q = self.build_Q(self.n_input, args.n_layers, args.n_hidden)
         self.target_Q.eval()
         self.target_Q.to(self.device)
-        self.replay = utils.ReplayBuffer(args.replay_capacity)
+        self.replay = ReplayBuffer(args.replay_capacity)
         self.optim = torch.optim.Adam(self.Q.parameters(), lr=args.lr, amsgrad=True)
 
     def act(self, state):
