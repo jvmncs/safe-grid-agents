@@ -66,9 +66,6 @@ def make_meters(history):
 
 
 def track_metrics(history, env, eval=False, write=True):
-    # Not sure what should happen with the toy environments, so nothing for now.
-    if not hasattr(env, "_env"):
-        return history
     # Update meters
     if not eval:
         ep = history["episode"]

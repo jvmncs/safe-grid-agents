@@ -13,7 +13,7 @@ def default_eval(agent, env, eval_history, args):
     state, done = env.reset(), False
 
     show = args.eval_visualize_episodes > 0
-    next_animation = [np.copy(env.render(mode="rgb_array"))]
+    next_animation = [np.copy(env._rgb)]
     episodes_to_show = []
 
     while True:
@@ -24,7 +24,7 @@ def default_eval(agent, env, eval_history, args):
                 animation = np.stack(next_animation)
                 animation = np.swapaxes(animation, 0, 1)  # swap color and time axes
                 episodes_to_show.append(animation)
-                next_animation = [np.copy(env.render(mode="rgb_array"))]
+                next_animation = [np.copy(env._rgb)]
                 show = args.eval_visualize_episodes > len(episodes_to_show)
             if eval_over:
                 break
@@ -36,7 +36,7 @@ def default_eval(agent, env, eval_history, args):
         eval_over = t >= args.eval_timesteps
 
         if show:
-            next_animation.append(np.copy(env.render(mode="rgb_array")))
+            next_animation.append(np.copy(env._rgb))
 
     if len(episodes_to_show) > 0:
         animation_tensor = np.stack(episodes_to_show)
