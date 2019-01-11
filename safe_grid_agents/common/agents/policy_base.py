@@ -18,9 +18,9 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
 
     def __init__(self, env, args) -> None:
         super().__init__()
-        self.action_n = int(env.action_space.max_action + 1)
+        self.action_n = env.action_space.n
         self.discount = args.discount
-        self.board_shape = env.observation_spec()["board"].shape
+        self.board_shape = env.observation_space.shape
         self.n_input = self.board_shape[0] * self.board_shape[1]
         self.device = args.device
         self.log_gradients = args.log_gradients
@@ -124,10 +124,10 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
 
         for r in range(self.rollouts):
             # Rollout loop
-            boards, actions, rewards, returns = [], [], [], []
+            states, actions, rewards, returns = [], [], [], []
             while not done:
-                action = self.old_policy.act_explore(state)
                 with torch.no_grad():
+                    action = self.old_policy.act_explore(state)
                     successor, reward, done, info = env.step(action)
 
                 # Maybe cheat
@@ -140,7 +140,7 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
                         pass
 
                 # Store data from experience
-                boards.append(board)  # .flatten())
+                states.append(state)  # .flatten())
                 actions.append(action)
                 rewards.append(float(reward))
 
@@ -149,13 +149,13 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
 
             returns = self.get_discounted_returns(rewards)
             history = ut.track_metrics(history, env)
-            rollout.states.append(boards)
+            rollout.states.append(states)
             rollout.actions.append(actions)
             rollout.rewards.append(rewards)
             rollout.returns.append(returns)
 
-            step_type, reward, discount, state = env.reset()
-            done = step_type.value == 2
+            state = env.reset()
+            done = False
 
         return rollout
 
