@@ -4,7 +4,11 @@ from safe_grid_agents.common.warmup import warmup_map
 from safe_grid_agents.common.learn import learn_map
 from safe_grid_agents.common.eval import eval_map
 from safe_grid_agents.common import utils as ut
+from safe_grid_gym.envs import GridworldEnv
 
+import safe_grid_gym
+
+import gym
 import os
 import time
 from tensorboardX import SummaryWriter
@@ -25,7 +29,7 @@ if __name__ == "__main__":
         args.log_dir = None
 
     # Get relevant env, agent, warmup function
-    env_class = env_map[args.env_alias]
+    env_name = env_map[args.env_alias]
     agent_class = agent_map[args.agent_alias]
     warmup_fn = warmup_map[args.agent_alias]
     learn_fn = learn_map[args.agent_alias]
@@ -37,17 +41,16 @@ if __name__ == "__main__":
     writer = SummaryWriter(args.log_dir)
     history["writer"] = writer
     eval_history["writer"] = writer
-    if args.cheat:
-        history["last_score"] = 0
 
     # Instantiate, warmup
-    env = env_class()
+    env = gym.make(env_name)
     agent = agent_class(env, args)
     agent, env, history, args = warmup_fn(agent, env, history, args)
 
     # Learn and occasionally eval
     history["t"], eval_history["period"] = 0, 0
-    env_state = env.reset()
+    init_state = env.reset()
+    env_state = init_state, 0.0, False, {}
     for episode in range(args.episodes):
         history["episode"] = episode
         env_state, history, eval_next = learn_fn(agent, env, env_state, history, args)
@@ -56,7 +59,7 @@ if __name__ == "__main__":
             eval_history = eval_fn(agent, env, eval_history, args)
             eval_next = False
 
-        env_state = env.reset()
+        env_state = env.reset(), 0.0, False, {}
 
     # One last eval
     eval_history = eval_fn(agent, env, eval_history, args)

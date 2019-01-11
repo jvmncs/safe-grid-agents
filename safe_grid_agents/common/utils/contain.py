@@ -2,7 +2,7 @@
 import numpy as np
 import collections
 from typing import List
-from ...types import Experience
+from safe_grid_agents.types import Experience
 
 
 class ReplayBuffer(object):

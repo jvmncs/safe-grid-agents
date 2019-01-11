@@ -1,15 +1,12 @@
 """Auto-constructs a CLI from relevant YAML config files."""
 import sys
 
-sys.path.insert(0, "ai-safety-gridworlds/")
 from ai_safety_gridworlds.environments.boat_race import BoatRaceEnvironment
 from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvironment
 from ai_safety_gridworlds.environments.side_effects_sokoban import (
     SideEffectsSokobanEnvironment,
 )
-from ai_safety_gridworlds.environments.tomato_watering_crmdp import (
-    TomatoWateringCRMDPEnvironment,
-)
+from ai_safety_gridworlds.environments.tomato_crmdp import TomatoCRMDPEnvironment
 
 
 from safe_grid_agents.common.agents import (
@@ -22,26 +19,28 @@ from safe_grid_agents.common.agents import (
     PPOCRMDPAgent,
 )
 from safe_grid_agents.ssrl import TabularSSQAgent
-from . import core_config, env_config, agent_config
+from safe_grid_agents.parsing import core_config, env_config, agent_config
 import yaml
 import argparse
 import copy
 from typing import Dict
-from ..types import Env, EnvName, Agent, AgentName
+from safe_grid_agents.types import EnvAlias, EnvName, Agent, AgentName
 
 # Mapping of envs/agents to Python classes
-env_map = {  # Dict[EnvName, Env]
-    # 'super':AbsentSupervisorEnvironment,
-    "boat": BoatRaceEnvironment,
-    # 'belt':ConveyorBeltEnvironment,
-    # 'lava':DistributionalShiftEnvironment,
-    # 'bandit':FriendFoeEnvironment,
-    # 'island':IslandNavigationEnvironment,
-    # 'interrupt':SafeInterruptibilityEnvironment,
-    "sokoban": SideEffectsSokobanEnvironment,
-    "tomato": TomatoWateringEnvironment,
-    # 'whisky':WhiskyOrGoldEnvironment,
-    "tomato-crmdp": TomatoWateringCRMDPEnvironment,
+env_map = {  # Dict[EnvAlias, EnvName]
+    "bandit": "FriendFoe-v0",
+    "belt": "ConveyorBelt-v0",
+    "boat": "BoatRace-v0",
+    "interrupt": "SafeInterruptibility-v0",
+    "island": "IslandNavigation-v0",
+    "lava": "DistributionalShift-v0",
+    "sokoban": "SideEffectsSokoban-v0",
+    "super": "AbsentSupervisor-v0",
+    "tomato": "TomatoWatering-v0",
+    "tomato-crmdp": "TomatoCrmdp-v0",
+    "whisky": "WhiskyGold-v0",
+    "corners": "ToyGridworldCorners-v0",
+    "way": "ToyGridworldOnTheWay-v0",
 }
 
 agent_map = {  # Dict[AgentName, Agent]

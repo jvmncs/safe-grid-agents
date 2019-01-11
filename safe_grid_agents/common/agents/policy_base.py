@@ -1,7 +1,7 @@
 """Policy gradient and actor-critic agents."""
-from . import base
-from .. import utils as ut
-from ...types import History, Rollout
+from safe_grid_agents.common.agents.base import BaseActor, BaseLearner, BaseExplorer
+from safe_grid_agents.common.utils import track_metrics
+from safe_grid_agents.types import History, Rollout
 
 import abc
 from typing import Tuple
@@ -11,16 +11,16 @@ import torch.nn as nn
 from torch.distributions import Categorical
 
 
-class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplorer):
+class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
     """Actor-critic variant of PPO."""
 
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, env, args) -> None:
         super().__init__()
-        self.action_n = int(env.action_spec().maximum + 1)
+        self.action_n = env.action_space.n
         self.discount = args.discount
-        self.board_shape = env.observation_spec()["board"].shape
+        self.board_shape = env.observation_space.shape
         self.n_input = self.board_shape[0] * self.board_shape[1]
         self.device = args.device
         self.log_gradients = args.log_gradients
@@ -118,26 +118,21 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
 
     def gather_rollout(self, env, env_state, history, args) -> Rollout:
         """Gather a single rollout from an old policy."""
-        step_type, reward, discount, state = env_state
+        state, reward, done, info = env_state
         done = False
         rollout = Rollout(states=[], actions=[], rewards=[], returns=[])
 
         for r in range(self.rollouts):
             # Rollout loop
-            boards, actions, rewards, returns = [], [], [], []
+            states, actions, rewards, returns = [], [], [], []
             while not done:
-                state = deepcopy(state)
-                board = state["board"]
-                action = self.old_policy.act_explore(board)
                 with torch.no_grad():
-                    step_type, reward, discount, successor = env.step(action)
-                    done = step_type.value == 2
+                    action = self.old_policy.act_explore(state)
+                    successor, reward, done, info = env.step(action)
 
                 # Maybe cheat
                 if args.cheat:
-                    current_score = env._get_hidden_reward()
-                    reward = current_score - history["last_score"]
-                    history["last_score"] = current_score
+                    reward = info["hidden_reward"]
                     # In case the agent is drunk, use the actual action they took
                     try:
                         action = successor["extra_observations"]["actual_actions"]
@@ -145,7 +140,7 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
                         pass
 
                 # Store data from experience
-                boards.append(board)  # .flatten())
+                states.append(state)  # .flatten())
                 actions.append(action)
                 rewards.append(float(reward))
 
@@ -154,13 +149,13 @@ class PPOBaseAgent(nn.Module, base.BaseActor, base.BaseLearner, base.BaseExplore
 
             returns = self.get_discounted_returns(rewards)
             history = ut.track_metrics(history, env)
-            rollout.states.append(boards)
+            rollout.states.append(states)
             rollout.actions.append(actions)
             rollout.rewards.append(rewards)
             rollout.returns.append(returns)
 
-            step_type, reward, discount, state = env.reset()
-            done = step_type.value == 2
+            state = env.reset()
+            done = False
 
         return rollout
 

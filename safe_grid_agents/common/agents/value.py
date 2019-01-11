@@ -1,7 +1,7 @@
 """Value-based agents."""
-from . import base
-from .. import utils
-from ...types import History, ExperienceBatch
+from safe_grid_agents.common.agents.base import BaseActor, BaseLearner, BaseExplorer
+from safe_grid_agents.common.utils import ReplayBuffer
+from safe_grid_agents.types import History, ExperienceBatch
 
 from collections import defaultdict
 import numpy as np
@@ -12,11 +12,11 @@ from torch.distributions import Categorical
 
 
 # Baseline agents
-class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
+class TabularQAgent(BaseActor, BaseLearner, BaseExplorer):
     """Tabular Q-learner."""
 
     def __init__(self, env, args):
-        self.action_n = int(env.action_spec().maximum + 1)
+        self.action_n = env.action_space.n
         self.discount = args.discount
 
         # Agent definition
@@ -58,12 +58,12 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         return self.epsilon
 
 
-class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
+class DeepQAgent(BaseActor, BaseLearner, BaseExplorer):
     """Q-learner with deep function approximation."""
 
     def __init__(self, env, args):
-        self.action_n = int(env.action_spec().maximum + 1)
-        board_shape = env.observation_spec()["board"].shape
+        self.action_n = env.action_space.n
+        board_shape = env.observation_space.shape
         self.n_input = board_shape[0] * board_shape[1]
         self.device = args.device
         self.log_gradients = args.log_gradients
@@ -83,13 +83,11 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         self.target_Q = self.build_Q(self.n_input, args.n_layers, args.n_hidden)
         self.target_Q.eval()
         self.target_Q.to(self.device)
-        self.replay = utils.ReplayBuffer(args.replay_capacity)
+        self.replay = ReplayBuffer(args.replay_capacity)
         self.optim = torch.optim.Adam(self.Q.parameters(), lr=args.lr, amsgrad=True)
 
     def act(self, state):
-        state_board = torch.as_tensor(
-            state.flatten(), dtype=torch.float32, device=self.device
-        ).reshape(1, -1)
+        state_board = self._lift(state.flatten()).reshape(1, -1)
         scores = self.Q(state_board)
         return scores.argmax(1)
 
@@ -161,30 +159,29 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
 
     def process(self, experiences) -> ExperienceBatch:
         """Convert gridworld representations to torch Tensors."""
-        boards = [experience.state.flatten() for experience in experiences]
-        boards = (
-            torch.as_tensor(
-                np.concatenate(boards, axis=0), dtype=torch.float32, device=self.device
-            )
-            .requires_grad_()
-            .reshape(-1, self.n_input)
+        boards = np.concatenate(
+            [experience.state.flatten() for experience in experiences], axis=0
         )
+        boards = self._lift(boards, grad=True).reshape(-1, self.n_input)
+
         actions = [experience.action for experience in experiences]
-        actions = torch.as_tensor(
-            actions, dtype=torch.long, device=self.device
-        ).reshape(-1, 1)
+        actions = self._lift(actions, dtype=torch.long).reshape(-1, 1)
+
         rewards = [experience.reward for experience in experiences]
-        rewards = torch.as_tensor(rewards, dtype=torch.float32, device=self.device)
-        successors = [experience.successor.flatten() for experience in experiences]
-        successors = (
-            torch.as_tensor(
-                np.concatenate(successors, axis=0),
-                dtype=torch.float32,
-                device=self.device,
-            )
-            .requires_grad_()
-            .reshape(-1, self.n_input)
+        rewards = self._lift(rewards)
+
+        successors = np.concatenate(
+            [experience.successor.flatten() for experience in experiences], axis=0
         )
+        successors = self._lift(successors, grad=True).reshape(-1, self.n_input)
+
         terminals = [experience.terminal for experience in experiences]
-        terminals = torch.as_tensor(terminals, dtype=torch.uint8, device=self.device)
+        terminals = self._lift(terminals, dtype=torch.uint8)
+
         return boards, actions, rewards, successors, terminals
+
+    def _lift(self, x, dtype=torch.float32, grad=False):
+        t = torch.as_tensor(x, dtype=dtype, device=self.device)
+        if grad:
+            t.requires_grad_()
+        return t

@@ -1,5 +1,5 @@
 [tool.black]
-py36 = true
+py35 = true
 exclude = '''
 (
     ai-safety-gridworlds
