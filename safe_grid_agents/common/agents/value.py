@@ -16,7 +16,7 @@ class TabularQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
     """Tabular Q-learner."""
 
     def __init__(self, env, args):
-        self.action_n = int(env.action_space.max_action + 1)
+        self.action_n = env.action_space.n
         self.discount = args.discount
 
         # Agent definition
@@ -62,8 +62,8 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
     """Q-learner with deep function approximation."""
 
     def __init__(self, env, args):
-        self.action_n = int(env.action_space.max_action + 1)
-        board_shape = env.observation_spec()["board"].shape
+        self.action_n = env.action_space.n
+        board_shape = env.observation_space.shape
         self.n_input = board_shape[0] * board_shape[1]
         self.device = args.device
         self.log_gradients = args.log_gradients
@@ -181,4 +181,7 @@ class DeepQAgent(base.BaseActor, base.BaseLearner, base.BaseExplorer):
         return boards, actions, rewards, successors, terminals
 
     def _lift(self, x, dtype=torch.float32, grad=False):
-        return torch.as_tensor(x, dtype=dtype, device=self.device, requires_grad=grad)
+        t = torch.as_tensor(x, dtype=dtype, device=self.device)
+        if grad:
+            t.requires_grad_()
+        return t

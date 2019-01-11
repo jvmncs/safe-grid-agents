@@ -11,7 +11,6 @@ def default_eval(agent, env, eval_history, args):
     eval_over = False
     t = 0
     state, done = env.reset(), False
-    board = state["board"]
 
     show = args.eval_visualize_episodes > 0
     next_animation = [np.copy(env._rgb)]

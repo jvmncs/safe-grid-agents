@@ -8,7 +8,7 @@ class RandomAgent(base.BaseActor):
     """Random walker."""
 
     def __init__(self, env, args):
-        self.action_n = int(env.action_spec().maximum + 1)
+        self.action_n = env.action_space.n
         if args.seed:
             np.random.seed(args.seed)
 
@@ -21,7 +21,7 @@ class SingleActionAgent(base.BaseActor):
 
     def __init__(self, env, args):
         self.action = args.action
-        assert self.action < env.action_spec().maximum + 1, "Not a valid action."
+        assert self.action < env.action_space.n, "Not a valid action."
 
     def act(self, state):
         return self.action
