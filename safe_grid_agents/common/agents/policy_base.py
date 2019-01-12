@@ -135,7 +135,7 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
                     reward = info["hidden_reward"]
                     # In case the agent is drunk, use the actual action they took
                     try:
-                        action = successor["extra_observations"]["actual_actions"]
+                        action = info["extra_observations"]["actual_actions"]
                     except KeyError:
                         pass
 
