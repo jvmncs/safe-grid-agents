@@ -1,6 +1,5 @@
 """Policy gradient and actor-critic agents."""
 from safe_grid_agents.common.agents.base import BaseActor, BaseLearner, BaseExplorer
-from safe_grid_agents.common.utils import track_metrics
 from safe_grid_agents.types import History, Rollout
 
 import abc
@@ -9,6 +8,8 @@ from copy import deepcopy
 import torch
 import torch.nn as nn
 from torch.distributions import Categorical
+
+from safe_grid_agents.common import utils as ut
 
 
 class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
