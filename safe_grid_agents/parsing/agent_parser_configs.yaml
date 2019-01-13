@@ -51,12 +51,12 @@ deep-q:
     alias: b
     type: int
     default: 64
-    help: "Batch size for Q network updates (default: 64)"
+    help: "Batch size for model training (default: 64)"
   device: &device
     alias: dv
     type: int
     default: 0
-    help: "If using CUDA, which device to use for DQN in PyTorch (default: 0)"
+    help: "If using CUDA, which device to use for training (default: 0)"
   log-gradients: &gradlog
     alias: lg
     action: store_true
@@ -119,6 +119,8 @@ ppo-cnn:
   n-layers: *layers
   device: *device
   log-gradients: *gradlog
+
+# (purportedly) safe RL agents
 ppo-crmdp:
   n-channels: *n_channels
   lr: *learnrate
@@ -131,8 +133,6 @@ ppo-crmdp:
   n-layers: *layers
   device: *device
   log-gradients: *gradlog
-
-# (purportedly) safe RL agents
 tabular-ssq:
   lr: *learnrate
   epsilon: *epsilon
