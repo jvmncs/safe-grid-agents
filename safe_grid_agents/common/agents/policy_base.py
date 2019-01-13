@@ -78,8 +78,9 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
             state_values = state_values.reshape(-1)
             policy_curr = Categorical(logits=prepolicy)
 
-            # Compute critic-adjusted returns
+            # Compute normalized, critic-adjusted returns
             adv = r - state_values
+            adv = (adv - adv.mean()) / adv.std()
 
             # Get log_probs for ratio -- Do not backprop through old policy!
             with torch.no_grad():
