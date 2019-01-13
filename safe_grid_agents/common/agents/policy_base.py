@@ -33,7 +33,8 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
         self.epochs = args.epochs
         self.clipping = args.clipping
         # self.gae = args.gae_coeff
-        # self.entropy = args.entropy_bonus
+        self.entropy_bonus = args.entropy_bonus
+        self.critic_coeff = args.critic_coeff
 
         # Network logistics
         self.build_ac()
@@ -44,10 +45,16 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
         self.old_policy.eval()
 
     def act(self, state) -> torch.Tensor:
+        state = torch.tensor(
+            state, requires_grad=False, dtype=torch.float32, device=self.device
+        )
         p, _ = self(state)
-        return p.argmax(-1)
+        return p.argmax(-1).item()
 
     def act_explore(self, state) -> torch.Tensor:
+        state = torch.tensor(
+            state, requires_grad=False, dtype=torch.float32, device=self.device
+        )
         policy = self.policy(state)
         return policy.sample().item()
 
@@ -135,7 +142,7 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
                     reward = info["hidden_reward"]
                     # In case the agent is drunk, use the actual action they took
                     try:
-                        action = successor["extra_observations"]["actual_actions"]
+                        action = info["extra_observations"]["actual_actions"]
                     except KeyError:
                         pass
 
@@ -148,7 +155,7 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
                 history["t"] += 1
 
             returns = self.get_discounted_returns(rewards)
-            history = ut.track_metrics(history, env)
+            history = track_metrics(history, env)
             rollout.states.append(states)
             rollout.actions.append(actions)
             rollout.rewards.append(rewards)

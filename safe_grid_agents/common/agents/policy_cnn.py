@@ -56,10 +56,6 @@ class PPOCNNAgent(PPOBaseAgent):
         self.critic_linear = nn.Linear(self.n_input * (self.n_channels), 1)
 
     def forward(self, x) -> Tuple[torch.Tensor, torch.Tensor]:
-        x = torch.tensor(
-            x, requires_grad=False, dtype=torch.float32, device=self.device
-        )
-
         if len(x.shape) == 2:
             x = x.reshape(1, 1, x.shape[0], x.shape[1])
         elif len(x.shape) == 3:
