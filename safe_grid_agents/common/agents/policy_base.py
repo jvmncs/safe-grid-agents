@@ -71,8 +71,8 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
             rlsz = self.rollouts * states.size(1)
             ixs = torch.randint(rlsz, size=(self.batch_size,), dtype=torch.long)
             s = states.reshape(rlsz, states.shape[2], states.shape[3])[ixs]
-            a = actions.reshape(rlsz, -1)[ixs]
-            r = returns.reshape(rlsz, -1)[ixs]
+            a = actions.reshape(rlsz, -1)[ixs].reshape(-1)
+            r = returns.reshape(rlsz, -1)[ixs].reshape(-1)
 
             prepolicy, state_values = self(s)
             state_values = state_values.reshape(-1)
@@ -94,9 +94,8 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
             # Calculate loss
             vf_loss = nn.functional.mse_loss(state_values, r.squeeze())
             pi_loss = -torch.min(
-                (adv * ratio).mean(),
-                (adv * ratio.clamp(1 - self.clipping, 1 + self.clipping)).mean(),
-            )
+                (adv * ratio), (adv * ratio.clamp(1 - self.clipping, 1 + self.clipping))
+            ).mean()
             loss = pi_loss + self.critic_coeff * vf_loss - self.entropy_bonus * entropy
 
             # Logging
