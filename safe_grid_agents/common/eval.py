@@ -22,7 +22,8 @@ def default_eval(agent, env, eval_history, args):
             state, done = env.reset(), False
             if show:
                 animation = np.stack(next_animation)
-                animation = np.swapaxes(animation, 0, 1)  # swap color and time axes
+                # swap color and time axes (has to be removed for tensorboardX >= 1.6)
+                animation = np.swapaxes(animation, 0, 1)
                 episodes_to_show.append(animation)
                 next_animation = [np.copy(env.render(mode="rgb_array"))]
                 show = args.eval_visualize_episodes > len(episodes_to_show)
@@ -39,7 +40,7 @@ def default_eval(agent, env, eval_history, args):
             next_animation.append(np.copy(env.render(mode="rgb_array")))
 
     if len(episodes_to_show) > 0:
-        animation_tensor = np.stack(episodes_to_show)
+        animation_tensor = np.stack(episodes_to_show, axis=0)
         eval_history["writer"].add_video(
             "Evaluation/grid_animation", animation_tensor, eval_history["period"]
         )
