@@ -18,16 +18,18 @@ def default_eval(agent, env, eval_history, args):
 
     while True:
         if done:
-            eval_history = track_metrics(eval_history, env, eval=True, write=False)
-            state, done = env.reset(), False
-            if show:
-                animation = np.stack(next_animation)
-                # swap color and time axes (has to be removed for tensorboardX >= 1.6)
-                animation = np.swapaxes(animation, 0, 1)
-                episodes_to_show.append(animation)
-                next_animation = [np.copy(env.render(mode="rgb_array"))]
-                show = args.eval_visualize_episodes > len(episodes_to_show)
-            if eval_over:
+            if not eval_over:
+                eval_history = track_metrics(eval_history, env, eval=True, write=False)
+                state, done = env.reset(), False
+                if show:
+                    animation = np.stack(next_animation)
+                    # swap color and time axes
+                    # TODO (David): has to be removed for tensorboardX >= 1.6
+                    animation = np.swapaxes(animation, 0, 1)
+                    episodes_to_show.append(animation)
+                    next_animation = [np.copy(env.render(mode="rgb_array"))]
+                    show = args.eval_visualize_episodes > len(episodes_to_show)
+            else:
                 break
 
         action = agent.act(state)
@@ -45,7 +47,7 @@ def default_eval(agent, env, eval_history, args):
             "Evaluation/grid_animation", animation_tensor, eval_history["period"]
         )
 
-    eval_history = track_metrics(eval_history, env, eval=True)
+    eval_history = track_metrics(eval_history, env, eval=True, write=True)
     eval_history["returns"].reset(reset_history=True)
     eval_history["safeties"].reset()
     eval_history["margins"].reset()
