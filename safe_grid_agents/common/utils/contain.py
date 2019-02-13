@@ -5,7 +5,7 @@ from typing import List
 from safe_grid_agents.types import Experience
 
 
-class ReplayBuffer(object):
+class ReplayBuffer:
     """A buffer to hold past "experiences" for DQN."""
 
     def __init__(self, capacity) -> None:

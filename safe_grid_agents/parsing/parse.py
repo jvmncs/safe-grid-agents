@@ -1,33 +1,31 @@
 """Auto-constructs a CLI from relevant YAML config files."""
-import sys
+
+from argparse import ArgumentParser
+from copy import deepcopy
+
+import yaml
 
 from ai_safety_gridworlds.environments.boat_race import BoatRaceEnvironment
-from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvironment
 from ai_safety_gridworlds.environments.side_effects_sokoban import (
     SideEffectsSokobanEnvironment,
 )
 from ai_safety_gridworlds.environments.tomato_crmdp import TomatoCRMDPEnvironment
-
-
+from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvironment
 from safe_grid_agents.common.agents import (
+    DeepQAgent,
+    PPOCNNAgent,
+    PPOCRMDPAgent,
+    PPOMLPAgent,
     RandomAgent,
     SingleActionAgent,
     TabularQAgent,
-    DeepQAgent,
-    PPOMLPAgent,
-    PPOCNNAgent,
-    PPOCRMDPAgent,
 )
+from safe_grid_agents.parsing import agent_config, core_config, env_config
 from safe_grid_agents.ssrl import TabularSSQAgent
-from safe_grid_agents.parsing import core_config, env_config, agent_config
-import yaml
-import argparse
-import copy
-from typing import Dict
-from safe_grid_agents.types import EnvAlias, EnvName, Agent, AgentName
+
 
 # Mapping of envs/agents to Python classes
-env_map = {  # Dict[EnvAlias, EnvName]
+ENV_MAP = {  # Dict[EnvAlias, EnvName]
     "bandit": "FriendFoe-v0",
     "belt": "ConveyorBelt-v0",
     "boat": "BoatRace-v0",
@@ -43,7 +41,7 @@ env_map = {  # Dict[EnvAlias, EnvName]
     "way": "ToyGridworldOnTheWay-v0",
 }
 
-agent_map = {  # Dict[AgentName, Agent]
+AGENT_MAP = {  # Dict[AgentName, Agent]
     "random": RandomAgent,
     "single": SingleActionAgent,
     "tabular-q": TabularQAgent,
@@ -55,25 +53,32 @@ agent_map = {  # Dict[AgentName, Agent]
 }
 
 # YAML conversion helper
-type_map = {"float": float, "int": int, "str": str}  # Dict[str, type]
+TYPE_MAP = {"float": float, "int": int, "str": str}  # Dict[str, type]
 
 
-def map_type(x):
+def map_type(x: str) -> type:
     try:
-        return type_map[x]
+        return TYPE_MAP[x]
     except KeyError:
         return x
 
 
-def handle_parser_args(parsers, name, configs):
-    """Assist adding arguments from `configs` to parser `name` from collection `parsers`."""
-    p = parsers[name]
-    config = configs[name]
+def handle_parser_args(parsers, name, configs) -> None:
+    """Assist adding arguments from `configs` to parser `name` from collection
+    `parsers`."""
+    p, config = parsers[name], configs[name]
+
     try:
+        # `list` is necessary since we pop the original config keys and we
+        # can't use `deepcopy` as `dict.keys()` is a generator and is therefore
+        # unpickleable.
         for key in list(config.keys()):
             argattrs = {k: map_type(v) for k, v in config.pop(key).items()}
-            alias = argattrs.pop("alias")
-            p.add_argument("-{}".format(alias), "--{}".format(key), **argattrs)
+            if "alias" in argattrs:
+                alias = argattrs.pop("alias")
+                p.add_argument("-{}".format(alias), "--{}".format(key), **argattrs)
+            else:  # some arguments have no short form
+                p.add_argument("--{}".format(key), **argattrs)
     except AttributeError:
         return
 
@@ -85,13 +90,13 @@ with open(env_config, "r") as env_yaml:
     env_parser_configs = yaml.load(env_yaml)
 with open(agent_config, "r") as agent_yaml:
     agent_parser_configs = yaml.load(agent_yaml)
-stashed_apcs = copy.deepcopy(agent_parser_configs)
+stashed_agent_parser_configs = deepcopy(agent_parser_configs)
 
 
-def prepare_parser():
+def prepare_parser() -> ArgumentParser:
     """Create all CLI parsers/subparsers."""
     # Handle core parser args
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         description="Learning (Hopefully) Safe Agents in Gridworlds"
     )
     handle_parser_args({"core": parser}, "core", core_parser_configs)
@@ -102,20 +107,20 @@ def prepare_parser():
     )
     env_subparsers.required = True
     env_parsers = {}
-    for env_name in env_map:
+    for env_name in ENV_MAP:
         env_parsers[env_name] = env_subparsers.add_parser(env_name)
         handle_parser_args(env_parsers, env_name, env_parser_configs)
 
     # Handle agent subparser args
     agent_subparsers = {}
     for env_name, env_parser in env_subparsers.choices.items():
-        agent_parser_configs = copy.deepcopy(stashed_apcs)
+        agent_parser_configs = deepcopy(stashed_agent_parser_configs)
         agent_subparsers[env_name] = env_parser.add_subparsers(
             help="Types of agents", dest="agent_alias"
         )
         agent_subparsers[env_name].required = True
         agent_parsers = {}
-        for agent_name in agent_map:
+        for agent_name in AGENT_MAP:
             agent_parsers[agent_name] = agent_subparsers[env_name].add_parser(
                 agent_name
             )

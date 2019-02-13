@@ -1,19 +1,20 @@
 """Agent-specific learning interactions."""
-import copy
 import functools
+from typing import Callable
 
 from safe_grid_agents.common import utils as ut
 
 
-def whiler(function):
-    """Evaluate the agent-specific learn function `fn` inside of a generic while loop."""
+def whiler(f: Callable) -> Callable:
+    """Evaluate the agent-specific learn function `f` inside of a generic
+    while loop."""
 
-    @functools.wraps(function)
+    @functools.wraps(f)
     def stepbystep(agent, env, env_state, history, args):
         done = False
         eval_next = False
         while not done:
-            env_state, history = function(agent, env, env_state, history, args)
+            env_state, history = f(agent, env, env_state, history, args)
             done = env_state[2]
             history["t"] += 1
         history = ut.track_metrics(history, env)
@@ -103,7 +104,7 @@ def ppo_learn(agent, env, env_state, history, args):
     return env_state, history, eval_next
 
 
-learn_map = {
+LEARN_MAP = {
     "deep-q": dqn_learn,
     "tabular-q": tabq_learn,
     "ppo-mlp": ppo_learn,

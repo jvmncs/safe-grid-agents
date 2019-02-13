@@ -1,65 +1,49 @@
-"""Main safe-grid-agents script with CLI."""
-from safe_grid_agents.parsing import prepare_parser, env_map, agent_map
-from safe_grid_agents.common.warmup import warmup_map
-from safe_grid_agents.common.learn import learn_map
-from safe_grid_agents.common.eval import eval_map
-from safe_grid_agents.common import utils as ut
-from safe_grid_gym.envs import GridworldEnv
-
-import safe_grid_gym
-
-import gym
 import os
-import time
-from tensorboardX import SummaryWriter
+import subprocess
 
-if __name__ == "__main__":
-    parser = prepare_parser()
-    args = parser.parse_args()
-    if args.disable_cuda:
-        args.device = "cpu"
+import ray
+from ray import tune
 
-    # Create logging directory
-    # The try/except is there in case log_dir is None,
-    # in which case we use the TensorboardX default
-    try:
-        if not os.path.exists(args.log_dir):
-            os.makedirs(args.log_dir, exist_ok=True)
-    except TypeError:
-        args.log_dir = None
+from safe_grid_agents.parsing import prepare_parser
+from train import train
+from tune_config import TUNE_KWARGS, tune_config
 
-    # Get relevant env, agent, warmup function
-    env_name = env_map[args.env_alias]
-    agent_class = agent_map[args.agent_alias]
-    warmup_fn = warmup_map[args.agent_alias]
-    learn_fn = learn_map[args.agent_alias]
-    eval_fn = eval_map[args.agent_alias]
 
-    # Trackers
-    history = ut.make_meters({})
-    eval_history = ut.make_meters({})
-    writer = SummaryWriter(args.log_dir)
-    history["writer"] = writer
-    eval_history["writer"] = writer
+parser = prepare_parser()
+args = parser.parse_args()
 
-    # Instantiate, warmup
-    env = gym.make(env_name)
-    agent = agent_class(env, args)
-    agent, env, history, args = warmup_fn(agent, env, history, args)
+if args.disable_cuda:
+    args.device = "cpu"
 
-    # Learn and occasionally eval
-    history["t"], eval_history["period"] = 0, 0
-    init_state = env.reset()
-    env_state = init_state, 0.0, False, {}
-    for episode in range(args.episodes):
-        history["episode"] = episode
-        env_state, history, eval_next = learn_fn(agent, env, env_state, history, args)
+args.commit_id = (
+    subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+    .decode("utf8")
+    .strip()
+)
 
-        if eval_next:
-            eval_history = eval_fn(agent, env, eval_history, args)
-            eval_next = False
 
-        env_state = env.reset(), 0.0, False, {}
+######## Logging into TensorboardX ########
+# If `args.log_dir` is None, we use the TensorBoardX default.
+if not (args.log_dir is None or os.path.exists(args.log_dir)):
+    os.makedirs(args.log_dir, exist_ok=True)
 
-    # One last eval
-    eval_history = eval_fn(agent, env, eval_history, args)
+
+if args.tune is not None:
+    ray.init()
+    config = tune_config(args)
+
+    # This lets us use argparse on top of ray tune while conforming
+    # to Tune's requirement that the train function take exactly 2
+    # arguments.
+    tune.register_trainable(
+        "train_curried_fn", lambda config, reporter: train(args, config, reporter)
+    )
+
+    # TODO(alok) Integrate Tune reporter with tensorboardX?
+    experiment_spec = tune.Experiment(
+        name="CRMDP", run="train_curried_fn", stop={}, config=config, **TUNE_KWARGS
+    )
+
+    tune.run_experiments(experiments=experiment_spec)
+else:
+    train(args)

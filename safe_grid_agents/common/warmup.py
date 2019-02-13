@@ -1,7 +1,8 @@
 """Agent-specific warmup interactions."""
+from collections import defaultdict
+
 import safe_grid_agents.ssrl.warmup as ss
 from safe_grid_agents.common.agents import RandomAgent
-from collections import defaultdict
 
 
 def dqn_warmup(agent, env, history, args):
@@ -16,7 +17,7 @@ def dqn_warmup(agent, env, history, args):
             state, done = env.reset(), False
 
         action = rando.act(None)
-        successor, reward, done, info = env.step(action)
+        successor, reward, done, _ = env.step(action)
         agent.replay.add(state, action, reward, successor, done)
 
     return agent, env, history, args
@@ -27,6 +28,6 @@ def noop_warmup(agent, env, history, args):
     return agent, env, history, args
 
 
-warmup_map = defaultdict(
+WARMUP_MAP = defaultdict(
     lambda: noop_warmup, {"tabular-ssq": ss.random_warmup, "deep-q": dqn_warmup}
 )

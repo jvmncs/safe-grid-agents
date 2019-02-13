@@ -56,4 +56,4 @@ def default_eval(agent, env, eval_history, args):
     return eval_history
 
 
-eval_map = defaultdict(lambda: default_eval, {})
+EVAL_MAP = defaultdict(lambda: default_eval, {})
