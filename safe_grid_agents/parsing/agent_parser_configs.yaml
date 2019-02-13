@@ -11,18 +11,17 @@ tabular-q:
   lr: &learnrate
     alias: l
     type: float
-    required: true
     help: "Learning rate (required)"
   epsilon: &epsilon
     alias: e
     type: float
-    default: .01
+    default: 0.01
     help: "Exploration constant for epsilon greedy policy (default: .01)"
   epsilon-anneal: &epsilon-anneal
     alias: dl
     type: int
-    default: 900000
-    help: "Number of timesteps to linearly anneal epsilon exploration (default: 900000)"
+    default: 100000
+    help: "Number of timesteps to linearly anneal epsilon exploration (default: 100,000)"
 deep-q:
   lr: *learnrate
   epsilon: *epsilon
@@ -82,12 +81,12 @@ ppo-mlp:
   clipping: &clipping
     alias: c
     type: float
-    default: .2
-    help: "Epsilon constant for clipping in surrogate loss (default: .2)"
+    default: 0.2
+    help: "Epsilon constant for clipping in surrogate loss (default: 0.2)"
   critic-coeff: &critic_coeff
     alias: cc
     type: float
-    default: 1.
+    default: 1.0
     help: "Scaling coefficient of critic loss; should be in (0,1] (default: 1)"
   # gae-coeff:
   #   alias: g
@@ -97,8 +96,8 @@ ppo-mlp:
   entropy-bonus: &entropy_bonus
     alias: eb
     type: float
-    default: .01
-    help: "Entropy bonus exploration coefficient (default: .01)"
+    default: 0.01
+    help: "Entropy bonus exploration coefficient (default: 0.01)"
   n-layers: *layers
   n-hidden: *hidden
   device: *device
@@ -150,8 +149,8 @@ tabular-ssq:
   fuzzy-query:
     alias: f
     type: float
-    default: 1.
-    help: "Probability of querying H while online if budget and delta conditions are met (default: 1.)"
+    default: 1.0
+    help: "Probability of querying H while online if budget and delta conditions are met (default: 1.0)"
   delta:
     alias: dt
     type: float

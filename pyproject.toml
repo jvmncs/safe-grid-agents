@@ -1,5 +1,6 @@
 [tool.black]
-py35 = true
+py36 = false
+skip-numeric-underscore-normalization = true
 exclude = '''
 (
     ai-safety-gridworlds

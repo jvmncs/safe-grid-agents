@@ -1,10 +1,12 @@
 """Utilities dealing with meters and tracking metrics."""
 
 import bisect
+from typing import Dict
+
 import numpy as np
 
 
-class AverageMeter(object):
+class AverageMeter:
     """Compute and store the average and current value.
 
     Extended from https://github.com/pytorch/examples/blob/master/imagenet/main.py#L247-L262
@@ -32,7 +34,7 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
         if self._history is not None:
-            for x in range(n):
+            for _ in range(n):
                 bisect.insort(self._history, val)
 
     def quantile(self, delta):
@@ -43,26 +45,22 @@ class AverageMeter(object):
             raise RuntimeError("Meter instantiated without history.")
 
     @property
-    def max(self):
+    def max(self) -> float:
         return self._max
 
 
-def make_meters(history):
+def make_meters(history) -> Dict:
     try:
         returns = history["returns"]
     except KeyError:
         returns = AverageMeter(include_history=True)
 
-    safeties = AverageMeter()
-    margins = AverageMeter()
-    margins_support = AverageMeter()
-
-    return dict(
-        returns=returns,
-        safeties=safeties,
-        margins=margins,
-        margins_support=margins_support,
-    )
+    return {
+        "returns": returns,
+        "safeties": AverageMeter(),
+        "margins": AverageMeter(),
+        "margins_support": AverageMeter(),
+    }
 
 
 def track_metrics(history, env, eval=False, write=True):

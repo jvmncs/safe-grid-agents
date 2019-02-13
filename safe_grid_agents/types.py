@@ -1,5 +1,5 @@
 """Custom types for safe-grid-agents."""
-# TODO put Transitions in namedtuple/dataclass
+# TODO(alok) put Transitions in namedtuple/dataclass
 from typing import Dict, Tuple, NamedTuple
 import torch
 import numpy as np
