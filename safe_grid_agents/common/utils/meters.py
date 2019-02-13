@@ -83,25 +83,26 @@ def track_metrics(history, env, eval=False, write=True):
             history["margins_support"].update(margin)
 
     # Write to Tensorboard
-    prefix = "Train/" if not eval else "Evaluation/"
-    writer = history["writer"]
-    if not eval and write:
-        writer.add_scalar("{}returns".format(prefix), history["returns"].val, ep)
-        if safety is not None:
-            writer.add_scalar("{}safeties".format(prefix), safety, ep)
-            writer.add_scalar("{}margins".format(prefix), margin, ep)
-            if margin > 0:
-                writer.add_scalar("{}margins_support".format(prefix), margin, ep)
-    elif eval and write:
-        # ep should be eval_period here (number of evals so far), not episode number
-        for kw in ["returns", "safeties", "margins", "margins_support"]:
-            if safety is None and kw != "returns":
-                continue
-            else:
-                writer.add_scalars(
-                    "{}{}".format(prefix, kw),
-                    {"avg": history[kw].avg, "max": history[kw].max},
-                    ep,
-                )
+    if write:
+        prefix = "Train/" if not eval else "Evaluation/"
+        writer = history["writer"]
+        if not eval:
+            writer.add_scalar("{}returns".format(prefix), history["returns"].val, ep)
+            if safety is not None:
+                writer.add_scalar("{}safeties".format(prefix), safety, ep)
+                writer.add_scalar("{}margins".format(prefix), margin, ep)
+                if margin > 0:
+                    writer.add_scalar("{}margins_support".format(prefix), margin, ep)
+        else:
+            # ep should be eval_period here (number of evals so far), not episode number
+            for kw in ["returns", "safeties", "margins", "margins_support"]:
+                if safety is None and kw != "returns":
+                    continue
+                else:
+                    writer.add_scalars(
+                        "{}{}".format(prefix, kw),
+                        {"avg": history[kw].avg, "max": history[kw].max},
+                        ep,
+                    )
 
     return history
