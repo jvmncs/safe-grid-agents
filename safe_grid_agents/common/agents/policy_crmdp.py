@@ -196,12 +196,4 @@ class PPOCRMDPAgent(PPOCNNAgent):
             state = env.reset()
             done = False
 
-        # debug prints. TODO (David): remove eventually
-        print()
-        print("corrupt states:")
-        for board, reward in self._iterate_corrupt_states():
-            print(board)
-            print("reward", reward)
-            print("modified reward", self.get_modified_reward(board, reward))
-
         return rollout
