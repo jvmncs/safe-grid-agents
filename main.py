@@ -1,4 +1,5 @@
 import os
+import random
 import subprocess
 
 import ray
@@ -12,6 +13,9 @@ from tune_config import TUNE_KWARGS, tune_config
 parser = prepare_parser()
 args = parser.parse_args()
 
+if args.seed is None:
+    args.seed = random.randrange(500)
+
 if args.disable_cuda:
     args.device = "cpu"
 
@@ -23,8 +27,13 @@ args.commit_id = (
 
 
 ######## Logging into TensorboardX ########
-# If `args.log_dir` is None, we use the TensorBoardX default.
-if not (args.log_dir is None or os.path.exists(args.log_dir)):
+# If `args.log_dir` is None, we attempt a default unique up to env, agent, cheating, and seed combinations.
+if args.log_dir is None:
+    cheating = "baseline" if args.cheat else "corrupt"
+    args.log_dir = os.path.join(
+        "runs", args.env_alias, args.agent_alias, cheating, str(args.seed)
+    )
+if not os.path.exists(args.log_dir):
     os.makedirs(args.log_dir, exist_ok=True)
 
 

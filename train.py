@@ -28,8 +28,6 @@ def train(args, config=None, reporter=noop):
         vars(args).update(config)
 
     # fix seed for reproducibility
-    if args.seed is None:
-        args.seed = random.randrange(500)
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -45,10 +43,7 @@ def train(args, config=None, reporter=noop):
 
     writer = SummaryWriter(args.log_dir)
     for k, v in args.__dict__.items():
-        if isinstance(v, (int, float)):
-            writer.add_scalar("data/{}".format(k), v)
-        else:
-            writer.add_text("data/{}".format(k), str(v))
+        writer.add_text("data/{}".format(k), str(v))
 
     history["writer"] = writer
     eval_history["writer"] = writer

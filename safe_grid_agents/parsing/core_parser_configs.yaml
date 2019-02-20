@@ -6,18 +6,18 @@ core:
   episodes:
     alias: E
     type: int
-    default: 10000
-    help: "Number of episodes (default: 10000)"
+    default: 2000
+    help: "Number of episodes (default: 2000)"
   eval-timesteps:
     alias: V
     type: int
-    default: 10000
-    help: "Approximate number of timesteps during eval period (default: 10000)"
+    default: 2000
+    help: "Approximate number of timesteps during eval period (default: 2000)"
   eval-every:
     alias: EE
     type: int
-    default: 500
-    help: "Number of episodes between eval periods (default: 500)"
+    default: 100
+    help: "Number of episodes between eval periods (default: 100)"
   eval-visualize-episodes:
     alias: EV
     type: int
@@ -35,7 +35,7 @@ core:
   log-dir:
     alias: L
     type: str
-    help: "Subdirectory to write logs to for this run (uses tensorboardX's default)"
+    help: "Subdirectory to write logs to for this run (defaults to combo of env, agent, cheating, seed)"
   disable-cuda:
     alias: dc
     action: store_true
