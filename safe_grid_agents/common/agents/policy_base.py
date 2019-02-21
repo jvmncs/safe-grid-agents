@@ -152,6 +152,9 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
                 state = successor
                 history["t"] += 1
 
+            if r != 0:
+                history["episode"] += 1
+
             returns = self.get_discounted_returns(rewards)
             history = track_metrics(history, env)
             rollout.states.append(states)

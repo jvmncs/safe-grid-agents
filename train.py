@@ -56,7 +56,7 @@ def train(args, config=None, reporter=noop):
     agent, env, history, args = warmup_fn(agent, env, history, args)
 
     ######## Learn (and occasionally evaluate) ########
-    history["t"], eval_history["period"] = 0, 0
+    history["t"], history["episode"], eval_history["period"] = 0, 0, 0
 
     for episode in range(args.episodes):
         env_state = (
@@ -65,7 +65,7 @@ def train(args, config=None, reporter=noop):
             False,
             {"hidden_reward": 0.0, "observed_reward": 0.0},
         )
-        history["episode"] = episode
+        history["episode"] += 1
         env_state, history, eval_next = learn_fn(agent, env, env_state, history, args)
         info = env_state[3]
         reporter(

@@ -182,6 +182,9 @@ class PPOCRMDPAgent(PPOCNNAgent):
                 state = successor
                 history["t"] += 1
 
+            if r != 0:
+                history["episode"] += 1
+
             self.identify_corruption_in_trajectory(successors_r, rewards)
             rewards = self.get_modified_rewards_for_rollout(successors_r, rewards)
 
