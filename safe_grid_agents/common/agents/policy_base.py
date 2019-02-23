@@ -21,7 +21,7 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
         self.action_n = env.action_space.n
         self.discount = args.discount
         self.board_shape = env.observation_space.shape
-        self.n_input = self.board_shape[0] * self.board_shape[1]
+        self.n_input = self.board_shape[0] * self.board_shape[1] * self.board_shape[2]
         self.device = args.device
         self.log_gradients = args.log_gradients
 
@@ -64,15 +64,20 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
 
     def learn(self, states, actions, rewards, returns, history, args) -> History:
         states = torch.as_tensor(states, dtype=torch.float, device=self.device)
-        actions = torch.as_tensor(actions, dtype=torch.long, device=self.device)
-        returns = torch.as_tensor(returns, dtype=torch.float, device=self.device)
+        rlsz = self.rollouts * states.size(1)
+        states = states.reshape(rlsz, states.shape[2], states.shape[3], states.shape[4])
+        actions = torch.as_tensor(
+            actions, dtype=torch.long, device=self.device
+        ).reshape(rlsz, -1)
+        returns = torch.as_tensor(
+            returns, dtype=torch.float, device=self.device
+        ).reshape(rlsz, -1)
 
         for epoch in range(self.epochs):
-            rlsz = self.rollouts * states.size(1)
             ixs = torch.randint(rlsz, size=(self.batch_size,), dtype=torch.long)
-            s = states.reshape(rlsz, states.shape[2], states.shape[3])[ixs]
-            a = actions.reshape(rlsz, -1)[ixs].reshape(-1)
-            r = returns.reshape(rlsz, -1)[ixs].reshape(-1)
+            s = states[ixs]
+            a = actions[ixs].reshape(-1)
+            r = returns[ixs].reshape(-1)
 
             prepolicy, state_values = self(s)
             state_values = state_values.reshape(-1)

@@ -98,7 +98,7 @@ def ppo_learn(agent, env, env_state, history, args):
     agent.sync()
 
     # Check for evaluating next
-    if history["episode"] % args.eval_every == args.eval_every - 1:
+    if history["episode"] % args.eval_every == 0 and history["episode"] > 0:
         eval_next = True
 
     return env_state, history, eval_next

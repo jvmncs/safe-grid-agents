@@ -5,23 +5,17 @@ from copy import deepcopy
 
 import yaml
 
-from ai_safety_gridworlds.environments.boat_race import BoatRaceEnvironment
-from ai_safety_gridworlds.environments.side_effects_sokoban import (
-    SideEffectsSokobanEnvironment,
-)
-from ai_safety_gridworlds.environments.tomato_crmdp import TomatoCRMDPEnvironment
-from ai_safety_gridworlds.environments.tomato_watering import TomatoWateringEnvironment
 from safe_grid_agents.common.agents import (
     DeepQAgent,
     PPOCNNAgent,
-    PPOCRMDPAgent,
     PPOMLPAgent,
     RandomAgent,
     SingleActionAgent,
     TabularQAgent,
 )
 from safe_grid_agents.parsing import agent_config, core_config, env_config
-from safe_grid_agents.ssrl import TabularSSQAgent
+from safe_grid_agents.spiky.agents import PPOCRMDPAgent
+from safe_grid_agents.ssrl.agents import TabularSSQAgent
 
 
 # Mapping of envs/agents to Python classes
@@ -39,6 +33,7 @@ ENV_MAP = {  # Dict[EnvAlias, EnvName]
     "whisky": "WhiskyGold-v0",
     "corners": "ToyGridworldCorners-v0",
     "way": "ToyGridworldOnTheWay-v0",
+    "trans-boat": "TransitionBoatRace-v0",
 }
 
 AGENT_MAP = {  # Dict[AgentName, Agent]

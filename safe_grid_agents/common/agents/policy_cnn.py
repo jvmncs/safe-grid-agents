@@ -16,8 +16,11 @@ class PPOCNNAgent(PPOBaseAgent):
 
     def build_ac(self) -> None:
         """Build the fused actor-critic architecture."""
+        in_channels = self.board_shape[0]
         first = nn.Sequential(
-            torch.nn.Conv2d(1, self.n_channels, kernel_size=3, stride=1, padding=1),
+            torch.nn.Conv2d(
+                in_channels, self.n_channels, kernel_size=3, stride=1, padding=1
+            ),
             nn.ReLU(),
         )
         hidden = nn.Sequential(
@@ -36,6 +39,9 @@ class PPOCNNAgent(PPOBaseAgent):
             )
         )
         self.network = nn.Sequential(first, hidden)
+        self.bottleneck = nn.Conv2d(
+            in_channels, self.n_channels, kernel_size=1, stride=1
+        )
 
         self.actor_cnn = nn.Sequential(
             torch.nn.Conv2d(
@@ -44,7 +50,8 @@ class PPOCNNAgent(PPOBaseAgent):
             nn.ReLU(),
         )
         self.actor_linear = nn.Linear(
-            self.n_input * (self.n_channels), int(self.action_n)
+            self.n_channels * self.board_shape[1] * self.board_shape[2],
+            int(self.action_n),
         )
 
         self.critic_cnn = nn.Sequential(
@@ -53,15 +60,15 @@ class PPOCNNAgent(PPOBaseAgent):
             ),
             nn.ReLU(),
         )
-        self.critic_linear = nn.Linear(self.n_input * (self.n_channels), 1)
+        self.critic_linear = nn.Linear(
+            self.n_channels * self.board_shape[1] * self.board_shape[2], 1
+        )
 
     def forward(self, x) -> Tuple[torch.Tensor, torch.Tensor]:
-        if len(x.shape) == 2:
-            x = x.reshape(1, 1, x.shape[0], x.shape[1])
-        elif len(x.shape) == 3:
-            x = x.unsqueeze(1)
+        if len(x.shape) == 3:
+            x = x.unsqueeze(0)
 
-        convolutions = self.network(x) + x
+        convolutions = self.network(x) + self.bottleneck(x)
 
         actor = self.actor_cnn(convolutions)
         actor = actor.reshape(actor.shape[0], -1)

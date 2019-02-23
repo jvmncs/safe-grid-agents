@@ -11,6 +11,7 @@ tabular-q:
   lr: &learnrate
     alias: l
     type: float
+    required: true
     help: "Learning rate (required)"
   epsilon: &epsilon
     alias: e

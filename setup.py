@@ -42,9 +42,12 @@ setuptools.setup(
         "rl "
         "reinforcement learning "
     ),
-    install_requires=["safe-grid-gym", "pyyaml", "moviepy", "tensorboardX<=1.5", "ray"],
-    dependency_links=[
-        "https://github.com/david-lindner/safe-grid-gym/tarball/master#egg=safe-grid-gym-0.2"
+    install_requires=[
+        "safe-grid-gym @ git+https://github.com/david-lindner/safe-grid-gym.git",
+        "pyyaml",
+        "moviepy",
+        "tensorboardX<=1.5",
+        "ray",
     ],
     packages=setuptools.find_packages(),
     zip_safe=True,
