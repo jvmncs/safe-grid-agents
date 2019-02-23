@@ -106,12 +106,14 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
 
             # Logging
             history["writer"].add_scalar(
-                "Train/policy_loss", pi_loss.item(), history["t"]
+                "Train/policy_loss", pi_loss.item(), history["t_learn"]
             )
             history["writer"].add_scalar(
-                "Train/value_loss", vf_loss.item(), history["t"]
+                "Train/value_loss", vf_loss.item(), history["t_learn"]
             )
-            history["writer"].add_scalar("Train/policy_entropy", entropy, history["t"])
+            history["writer"].add_scalar(
+                "Train/policy_entropy", entropy, history["t_learn"]
+            )
 
             # Backprop and step with optional gradient logging
             self.optim.zero_grad()
@@ -123,6 +125,8 @@ class PPOBaseAgent(nn.Module, BaseActor, BaseLearner, BaseExplorer):
                             name, param.grad.clone().cpu().data.numpy(), history["t"]
                         )
             self.optim.step()
+
+            history["t_learn"] += 1
 
         return history
 
