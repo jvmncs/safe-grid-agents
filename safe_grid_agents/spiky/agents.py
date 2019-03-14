@@ -1,5 +1,4 @@
 """PPO Agent for CRMDPs."""
-import sys
 import torch
 import numpy as np
 from typing import Generator, List
@@ -11,17 +10,62 @@ from safe_grid_agents.types import Rollout
 from ai_safety_gridworlds.environments.tomato_crmdp import REWARD_FACTOR
 
 
+def _get_agent_position(board, agent_value):
+    x_pos, y_pos = np.unravel_index(
+        np.argwhere(np.ravel(board) == agent_value), board.shape
+    )
+    x_pos, y_pos = x_pos.flat[0], y_pos.flat[0]
+    return x_pos, y_pos
+
+
+def _manhatten_distance(x1, x2, y1, y2):
+    return abs(x1 - x2) + abs(y1 - y2)
+
+
 def d_tomato_crmdp(X, Y):
+    assert X.shape == Y.shape
     return REWARD_FACTOR * np.sum(X != Y)
 
 
 def d_toy_gridworlds(X, Y):
     assert X.shape == Y.shape
-    X_pos_x, X_pos_y = np.unravel_index(np.argwhere(np.ravel(X) == 0), X.shape)
-    Y_pos_x, Y_pos_y = np.unravel_index(np.argwhere(np.ravel(Y) == 0), X.shape)
-    X_pos_x, X_pos_y = X_pos_x.flat[0], X_pos_y.flat[0]
-    Y_pos_x, Y_pos_y = Y_pos_x.flat[0], Y_pos_y.flat[0]
-    return abs(X_pos_x - Y_pos_x) + abs(X_pos_y - Y_pos_y)
+    # toy gridworlds use value 0 to denote the agent on the board
+    X_pos_x, X_pos_y = _get_agent_position(X, agent_value=0)
+    Y_pos_x, Y_pos_y = _get_agent_position(Y, agent_value=0)
+    return _manhatten_distance(X_pos_x, Y_pos_x, X_pos_y, Y_pos_y)
+
+
+def d_trans_boat(X, Y):
+    assert X.shape == Y.shape
+    X_initial, X_final = X[0, ...], X[1, ...]
+    Y_initial, Y_final = Y[0, ...], Y[1, ...]
+
+    # deepmind gridworlds use value 2 to denote the agent on the board
+    X_initial_pos_x, X_initial_pos_y = _get_agent_position(X_initial, agent_value=2)
+    Y_initial_pos_x, Y_initial_pos_y = _get_agent_position(Y_initial, agent_value=2)
+    X_final_pos_x, X_final_pos_y = _get_agent_position(X_final, agent_value=2)
+    Y_final_pos_x, Y_final_pos_y = _get_agent_position(Y_final, agent_value=2)
+
+    X_direction_x = X_final_pos_x - X_initial_pos_x
+    X_direction_y = X_final_pos_y - X_initial_pos_y
+    Y_direction_x = Y_final_pos_x - Y_initial_pos_x
+    Y_direction_y = Y_final_pos_y - Y_initial_pos_y
+
+    initial_position_distance = _manhatten_distance(
+        X_initial_pos_x, Y_initial_pos_x, X_initial_pos_y, Y_initial_pos_y
+    )
+    direction_distance = int(X_direction_x != Y_direction_x)
+    direction_distance += int(X_direction_y != Y_direction_y)
+
+    return initial_position_distance + direction_distance
+
+
+ENV_TO_D = {
+    "corners": d_toy_gridworlds,
+    "way": d_toy_gridworlds,
+    "tomato-crmdp": d_tomato_crmdp,
+    "trans-boat": d_trans_boat,
+}
 
 
 class PPOCRMDPAgent(PPOCNNAgent):
@@ -30,7 +74,7 @@ class PPOCRMDPAgent(PPOCNNAgent):
     def __init__(self, env, args) -> None:
         super().__init__(env, args)
         self.states = dict()
-        self.d = d_toy_gridworlds
+        self.d = ENV_TO_D[args.env_alias]
         self.epsilon = 1e-3
         self.rllb = dict()
 
