@@ -1,5 +1,6 @@
 """PPO Agent for CRMDPs."""
 import torch
+import random
 import numpy as np
 from typing import Generator, List
 
@@ -79,6 +80,7 @@ class PPOCRMDPAgent(PPOCNNAgent):
         self.d = ENV_TO_D[args.env_alias]
         self.epsilon = 1e-3
         self.rllb = dict()
+        self.state_memory_cap = 0
 
     def _mark_state_corrupt(self, board, reward) -> None:
         assert board.dtype == np.float32
@@ -111,12 +113,13 @@ class PPOCRMDPAgent(PPOCNNAgent):
     def _update_rllb(self) -> None:
         """Update the reward lower Lipschitz bound."""
         for corrupt_board, corrupt_reward in self._iterate_corrupt_states():
-            rllb = None
+            board_string = corrupt_board.tostring()
+            rllb = self.rllb.get(board_string, None)
             for safe_board, safe_reward in self._iterate_safe_states():
                 bound = safe_reward - self.d(safe_board, corrupt_board)
                 if rllb is None or bound > rllb:
                     rllb = bound
-            self.rllb[corrupt_board.tostring()] = rllb
+            self.rllb[board_string] = rllb
 
     def _get_TLV(self, boardX, rewardX, state_iterator) -> float:
         """Return the total Lipschitz violation of a state X w.r.t a set of states.
@@ -128,6 +131,22 @@ class PPOCRMDPAgent(PPOCNNAgent):
                 TLV += max(0, abs(rewardX - rewardY) - self.d(boardY, boardX))
                 unique_states.add(boardY.tostring())
         return TLV
+
+    def _purge_memory(self) -> None:
+        """Drop random noncorrupt states from the memory for performance reasons."""
+        if len(self.states) > self.state_memory_cap:
+            to_remove = [
+                state
+                for state in random.sample(
+                    self.states.keys(), len(self.states) - self.state_memory_cap / 2
+                )
+                if self.states[state][0]
+            ]
+            for state in to_remove:
+                del self.states[state]
+            # we might have too many corrupt states, so update the bounds
+            if len(self.states) > 2 * self.state_memory_cap / 3:
+                self.state_memory_cap *= 2
 
     def get_modified_reward(self, board, reward) -> float:
         """Return the reward to use for optimizing the policy based on the rllb."""
@@ -241,6 +260,9 @@ class PPOCRMDPAgent(PPOCNNAgent):
             rollout.rewards.append(rewards)
             rollout.returns.append(returns)
             successors.append(successors_r)
+
+            self.state_memory_cap = max(self.state_memory_cap, 20 * len(states))
+            self._purge_memory()
 
             state = env.reset()
             done = False
