@@ -29,6 +29,8 @@ def d_tomato_crmdp(X, Y):
 
 def d_toy_gridworlds(X, Y):
     assert X.shape == Y.shape
+    X = X[0, ...]
+    Y = Y[0, ...]
     # toy gridworlds use value 0 to denote the agent on the board
     X_pos_x, X_pos_y = _get_agent_position(X, agent_value=0)
     Y_pos_x, Y_pos_y = _get_agent_position(Y, agent_value=0)
