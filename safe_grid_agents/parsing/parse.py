@@ -80,11 +80,11 @@ def handle_parser_args(parsers, name, configs) -> None:
 
 # Import yaml configs
 with open(core_config) as core_yaml:
-    core_parser_configs = yaml.load(core_yaml)
+    core_parser_configs = yaml.safe_load(core_yaml)
 with open(env_config, "r") as env_yaml:
-    env_parser_configs = yaml.load(env_yaml)
+    env_parser_configs = yaml.safe_load(env_yaml)
 with open(agent_config, "r") as agent_yaml:
-    agent_parser_configs = yaml.load(agent_yaml)
+    agent_parser_configs = yaml.safe_load(agent_yaml)
 stashed_agent_parser_configs = deepcopy(agent_parser_configs)
 
 

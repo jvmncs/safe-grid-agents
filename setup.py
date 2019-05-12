@@ -44,7 +44,7 @@ setuptools.setup(
     ),
     install_requires=[
         "safe-grid-gym @ git+https://github.com/david-lindner/safe-grid-gym.git",
-        "pyyaml",
+        "pyyaml>=5.1",
         "moviepy",
         "tensorboardX<=1.5",
         "ray",
